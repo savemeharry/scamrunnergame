@@ -364,7 +364,6 @@ document.addEventListener("mouseup", (e) => {
 });
 
 dashBtn.addEventListener("touchstart", (e) => {
-   e.preventDefault();
   if (player.isDashing) return;
   const now = Date.now();
   if ((now - lastDashTime < DASH_COOLDOWN) && comboCount === 0) {
@@ -382,7 +381,6 @@ dashBtn.addEventListener("touchstart", (e) => {
 });
 
 dashBtn.addEventListener("touchmove", (e) => {
-     e.preventDefault();
   if (!isSwipeDashActive) return;
   const touch = e.touches[0];
   dashCurrent.x = touch.clientX;
@@ -390,7 +388,6 @@ dashBtn.addEventListener("touchmove", (e) => {
 });
 
 dashBtn.addEventListener("touchend", (e) => {
-      e.preventDefault();
   if (!isSwipeDashActive) return;
   isSwipeDashActive = false;
 
@@ -406,27 +403,21 @@ dashBtn.addEventListener("touchend", (e) => {
 
 // Добавил touchstart/touchmove/touchend на кнопки влево и вправо
 leftBtn.addEventListener('touchstart', (e) => {
-     e.preventDefault();
     keys.left = true;
     player.direction = 'left';
 });
 leftBtn.addEventListener('touchmove', (e) => {
-   e.preventDefault();
 })
 leftBtn.addEventListener('touchend', (e) => {
-    e.preventDefault();
     keys.left = false;
 });
 rightBtn.addEventListener('touchstart', (e) => {
-  e.preventDefault();
     keys.right = true;
     player.direction = 'right';
 });
 rightBtn.addEventListener('touchmove', (e) => {
-     e.preventDefault();
 })
 rightBtn.addEventListener('touchend', (e) => {
-   e.preventDefault();
     keys.right = false;
 });
 
@@ -788,7 +779,7 @@ function updateGame() {
 
     if (distance < collisionDistance) {
       if (player.isDashing) {
-        meteors.splice(index, 1);
+                meteors.splice(index, 1);
         explosions.push({ x: meteor.x, y: meteor.y, radius: 10, alpha: 1 });
         lastDashKill = true;
       } else {
@@ -1798,6 +1789,7 @@ function checkCheatCode(code) {
     if (cheatIndex === cheatSequence.length) {
       cheatActivated = true;
       player.invulnerable = true;
+        showCollisionBox = 1;
       // Можно добавить уведомление об активации чит-кода
       spawnFloatingText("Cheat Activated!", player.x + player.width / 2, player.y - 50);
     }
@@ -2095,46 +2087,37 @@ function updateDashAnimations() {
 // =============================
 // 13. Запуск игры при загрузке
 // =============================
+window.onload = () => {
+    handleResize()
+    window.addEventListener('resize', handleResize);
 
-// Определение необходимых функций
-function handleResize() {
-    // Ваша логика изменения размера
-    console.log("handleResize вызван");
-}
+    // Telegram Mini Apps settings
+    if(window.Telegram) {
+        //Отключаем свайпы по области контента
+       window.Telegram.WebApp.disableVerticalSwipes();
 
-document.addEventListener('DOMContentLoaded', () => {
-    // Проверяем доступность Telegram WebApp
-    if (window.Telegram && window.Telegram.WebApp) {
-        console.log("Telegram WebApp доступен");
+        //Запрос на фулл скрин
+          if(window.Telegram.WebApp.isVersionAtLeast("8.0")) {
+                try {
+                     window.Telegram.WebApp.requestFullscreen();
+                     console.log("isFullScreen: " + window.Telegram.WebApp.isFullscreen);
+                } catch (e) {
+                   console.error("Ошибка при попытке фуллскрина:", e);
+                }
+            }
 
-        try {
-            // Отключаем вертикальные свайпы по области контента
-            window.Telegram.WebApp.disableVerticalSwipes();
-            console.log("disableVerticalSwipes вызван");
-
-            // Проверка состояния после вызова
-            console.log("isVerticalSwipesEnabled: " + window.Telegram.WebApp.isVerticalSwipesEnabled);
-
-            // Добавляем обработчик события изменения области просмотра
-            window.Telegram.WebApp.onEvent("viewportChanged", () => {
-                console.log("Событие viewportChanged получено");
-                // Если у вас есть функция handleResize, вызовите её здесь
-                // handleResize();
-            });
-
-            // Добавляем обработчик нового события scanQrPopupClosed
-            window.Telegram.WebApp.onEvent("scanQrPopupClosed", () => {
-                console.log("Событие scanQrPopupClosed получено");
-            });
-
-            // Уведомляем Telegram, что Mini App готов к отображению
-            window.Telegram.WebApp.ready();
-            console.log("Telegram WebApp готов");
-
-        } catch (error) {
-            console.error("Ошибка при вызове методов Telegram WebApp:", error);
+        if (window.Telegram.WebApp.platform === "ios") {
+             window.Telegram.WebApp.expand();
+            console.log("isFullScreen: " + window.Telegram.WebApp.isExpanded);
+          }
+          
+         if(window.Telegram.WebApp.isExpanded){
+            handleResize()
         }
-    } else {
-        console.log("Telegram WebApp не доступен");
+        
+          window.Telegram.WebApp.onEvent("viewportChanged", handleResize);
+         window.Telegram.WebApp.onEvent("fullscreenChanged", ()=> {
+           console.log("isFullScreen: " + window.Telegram.WebApp.isFullscreen);
+          });
     }
-});
+};
