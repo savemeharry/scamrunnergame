@@ -2095,24 +2095,45 @@ function updateDashAnimations() {
 // =============================
 // 13. Запуск игры при загрузке
 // =============================
+
+// Определение необходимых функций
+function handleResize() {
+    // Ваша логика изменения размера
+    console.log("handleResize вызван");
+}
+
+// Инициализация при загрузке окна
 window.onload = () => {
-    handleResize()
+    handleResize();
     window.addEventListener('resize', handleResize);
 
-    // Telegram Mini Apps settings
-    if(window.Telegram) {
-          //Отключаем свайпы по области контента
-        window.Telegram.WebApp.disableVerticalSwipes();
+    // Настройки Telegram Mini App
+    if (window.Telegram && window.Telegram.WebApp) {
+        console.log("Telegram WebApp доступен");
 
-         if (window.Telegram.WebApp.platform === "ios") {
-             window.Telegram.WebApp.expand();
-            console.log("isFullScreen: " + window.Telegram.WebApp.isExpanded);
-          }
-         if(window.Telegram.WebApp.isExpanded){
-            handleResize()
+        try {
+            // Отключаем вертикальные свайпы по области контента
+            window.Telegram.WebApp.disableVerticalSwipes();
+            console.log("disableVerticalSwipes вызван");
+
+            // Проверка состояния после вызова
+            console.log("isVerticalSwipesEnabled: " + window.Telegram.WebApp.isVerticalSwipesEnabled);
+
+            // Добавляем обработчик события изменения области просмотра
+            window.Telegram.WebApp.onEvent("viewportChanged", () => {
+                console.log("Событие viewportChanged получено");
+                handleResize();
+            });
+
+            // Добавляем обработчик нового события scanQrPopupClosed
+            window.Telegram.WebApp.onEvent("scanQrPopupClosed", () => {
+                console.log("Событие scanQrPopupClosed получено");
+            });
+
+        } catch (error) {
+            console.error("Ошибка при вызове disableVerticalSwipes:", error);
         }
-
-        window.Telegram.WebApp.onEvent("viewportChanged", handleResize);
-       //убрали отслеживание фулскрин - тк это делается в ботфазере
+    } else {
+        console.log("Telegram WebApp не доступен");
     }
 };
