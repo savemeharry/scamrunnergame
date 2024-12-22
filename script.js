@@ -2099,9 +2099,21 @@ window.onload = () => {
     handleResize()
     window.addEventListener('resize', handleResize);
 
-     // Telegram Mini Apps settings
+    // Telegram Mini Apps settings
     if(window.Telegram) {
-         window.Telegram.WebApp.isVerticalSwipesEnabled = false;
+        //Отключаем свайпы по области контента
+       window.Telegram.WebApp.disableVerticalSwipes();
+
+        //Запрос на фулл скрин
+          if(window.Telegram.WebApp.isVersionAtLeast("8.0")) {
+                try {
+                     window.Telegram.WebApp.requestFullscreen();
+                     console.log("isFullScreen: " + window.Telegram.WebApp.isFullscreen);
+                } catch (e) {
+                   console.error("Ошибка при попытке фуллскрина:", e);
+                }
+            }
+
         if (window.Telegram.WebApp.platform === "ios") {
              window.Telegram.WebApp.expand();
             console.log("isFullScreen: " + window.Telegram.WebApp.isExpanded);
@@ -2110,6 +2122,9 @@ window.onload = () => {
          if(window.Telegram.WebApp.isExpanded){
             handleResize()
         }
-        window.Telegram.WebApp.onEvent("viewportChanged", handleResize)
+          window.Telegram.WebApp.onEvent("viewportChanged", handleResize);
+         window.Telegram.WebApp.onEvent("fullscreenChanged", ()=> {
+           console.log("isFullScreen: " + window.Telegram.WebApp.isFullscreen);
+          });
     }
 };
