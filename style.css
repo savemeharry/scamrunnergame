@@ -12,20 +12,35 @@ body {
   justify-content: center;
   align-items: center;
   height: 100vh;
-    user-select: none; /* запрет выделения текста */
+      user-select: none;
+       -webkit-user-select: none; /* Safari */
+          -moz-user-select: none; /* Firefox */
+          -ms-user-select: none; /* IE/Edge */
+          -webkit-touch-callout: none; /* отключает менюшку копирования */
+         -webkit-tap-highlight-color: transparent; /* отключает подсветку */
 }
 
 canvas {
     image-rendering: pixelated;
     image-rendering: crisp-edges;
     will-change: transform;
-    user-select: none; /* запрет выделения текста */
+     user-select: none;
+       -webkit-user-select: none; /* Safari */
+          -moz-user-select: none; /* Firefox */
+          -ms-user-select: none; /* IE/Edge */
+          -webkit-touch-callout: none; /* отключает менюшку копирования */
+         -webkit-tap-highlight-color: transparent; /* отключает подсветку */
 }
 img {
     image-rendering: pixelated;
     image-rendering: crisp-edges;
     will-change: transform;
-    user-select: none; /* запрет выделения текста */
+    user-select: none;
+       -webkit-user-select: none; /* Safari */
+          -moz-user-select: none; /* Firefox */
+          -ms-user-select: none; /* IE/Edge */
+          -webkit-touch-callout: none; /* отключает менюшку копирования */
+         -webkit-tap-highlight-color: transparent; /* отключает подсветку */
 }
 
 
@@ -34,7 +49,12 @@ img {
   position: relative;
   z-index: 1;
   border: 2px solid #555;
-   user-select: none; /* запрет выделения текста */
+    user-select: none;
+       -webkit-user-select: none; /* Safari */
+          -moz-user-select: none; /* Firefox */
+          -ms-user-select: none; /* IE/Edge */
+          -webkit-touch-callout: none; /* отключает менюшку копирования */
+         -webkit-tap-highlight-color: transparent; /* отключает подсветку */
 }
 
 .overlay {
@@ -50,24 +70,44 @@ img {
   justify-content: center;
   align-items: center;
   z-index: 10;
-   user-select: none; /* запрет выделения текста */
+    user-select: none;
+       -webkit-user-select: none; /* Safari */
+          -moz-user-select: none; /* Firefox */
+          -ms-user-select: none; /* IE/Edge */
+          -webkit-touch-callout: none; /* отключает менюшку копирования */
+         -webkit-tap-highlight-color: transparent; /* отключает подсветку */
 }
 
 #startScreen, #gameOverScreen, #victoryScreen {
   display: none;
-   user-select: none; /* запрет выделения текста */
+      user-select: none;
+       -webkit-user-select: none; /* Safari */
+          -moz-user-select: none; /* Firefox */
+          -ms-user-select: none; /* IE/Edge */
+          -webkit-touch-callout: none; /* отключает менюшку копирования */
+         -webkit-tap-highlight-color: transparent; /* отключает подсветку */
 }
 
 #startScreen {
   display: flex;
-    user-select: none; /* запрет выделения текста */
+    user-select: none;
+       -webkit-user-select: none; /* Safari */
+          -moz-user-select: none; /* Firefox */
+          -ms-user-select: none; /* IE/Edge */
+          -webkit-touch-callout: none; /* отключает менюшку копирования */
+         -webkit-tap-highlight-color: transparent; /* отключает подсветку */
 }
 
 #victoryScreen img {
   width: 150px;
   height: 150px;
   margin-bottom: 20px;
-    user-select: none; /* запрет выделения текста */
+    user-select: none;
+       -webkit-user-select: none; /* Safari */
+          -moz-user-select: none; /* Firefox */
+          -ms-user-select: none; /* IE/Edge */
+          -webkit-touch-callout: none; /* отключает менюшку копирования */
+         -webkit-tap-highlight-color: transparent; /* отключает подсветку */
 }
 
 button {
@@ -83,7 +123,12 @@ button {
   background-color: #28a745;
   color: white;
   transition: opacity 0.3s, background 0.3s;
-    user-select: none; /* запрет выделения текста */
+    user-select: none;
+       -webkit-user-select: none; /* Safari */
+          -moz-user-select: none; /* Firefox */
+          -ms-user-select: none; /* IE/Edge */
+          -webkit-touch-callout: none; /* отключает менюшку копирования */
+         -webkit-tap-highlight-color: transparent; /* отключает подсветку */
 }
 
 button:hover {
@@ -102,7 +147,12 @@ button:disabled {
   display: flex;
   gap: 10px;
   z-index: 5;
-     user-select: none; /* запрет выделения текста */
+     user-select: none;
+       -webkit-user-select: none; /* Safari */
+          -moz-user-select: none; /* Firefox */
+          -ms-user-select: none; /* IE/Edge */
+          -webkit-touch-callout: none; /* отключает менюшку копирования */
+         -webkit-tap-highlight-color: transparent; /* отключает подсветку */
 }
 
 .control-button {
@@ -120,7 +170,12 @@ button:disabled {
   position: relative;
   overflow: hidden;
   transition: opacity 0.3s, background 0.3s;
-    user-select: none; /* запрет выделения текста */
+      user-select: none;
+       -webkit-user-select: none; /* Safari */
+          -moz-user-select: none; /* Firefox */
+          -ms-user-select: none; /* IE/Edge */
+          -webkit-touch-callout: none; /* отключает менюшку копирования */
+         -webkit-tap-highlight-color: transparent; /* отключает подсветку */
 }
 
 .control-button:disabled {
@@ -154,7 +209,12 @@ button:disabled {
   opacity: 0;
   transition: opacity 0.5s;
   z-index: 5;
-    user-select: none; /* запрет выделения текста */
+    user-select: none;
+       -webkit-user-select: none; /* Safari */
+          -moz-user-select: none; /* Firefox */
+          -ms-user-select: none; /* IE/Edge */
+          -webkit-touch-callout: none; /* отключает менюшку копирования */
+         -webkit-tap-highlight-color: transparent; /* отключает подсветку */
 }
 
 #meowBtn.cooldown::after,
