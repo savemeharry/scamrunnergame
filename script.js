@@ -58,6 +58,8 @@ let fadeAlpha = 0;
 let canvasScale = 1; // Масштаб канваса
 let screenWidth = 0;
 let screenHeight = 0;
+let canvasOffsetX = 0;
+let canvasOffsetY = 0;
 
 let isSwipeDashActive = false;
 let dashStart = { x: 0, y: 0 };
@@ -79,6 +81,7 @@ const rightBtn = document.getElementById("rightBtn");
 const jumpBtn = document.getElementById("jumpBtn");
 const meowBtn = document.getElementById("meowBtn");
 const dashBtn = document.getElementById("dashBtn");
+const controls = document.getElementById('controls');
 
 // Подгружаем изображения
 function loadImage(src) {
@@ -955,8 +958,8 @@ function drawGame(screenWidth, screenHeight) {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     
     ctx.save();
-     const offsetX = (canvas.width - 400 * canvasScale)/2
-       const offsetY = (canvas.height - 700 * canvasScale) / 2;
+     const offsetX = canvasOffsetX;
+     const offsetY = canvasOffsetY;
         ctx.translate(offsetX, offsetY);
       ctx.scale(canvasScale, canvasScale);
 
@@ -1112,23 +1115,29 @@ function drawGame(screenWidth, screenHeight) {
    }
 
   // Рисуем интерфейс
-  ctx.drawImage(layers.energyIcon, 20, 20, 30, 30);
-  ctx.fillStyle = "white";
-   ctx.font = "20px 'Micro 5', sans-serif";
-  ctx.textAlign = "left";
-  ctx.fillText(`${player.energy}`, 60, 45);
+    const energyIconX = 20;
+    const energyIconY = 20;
+    ctx.drawImage(layers.energyIcon, energyIconX, energyIconY, 30, 30);
+    ctx.fillStyle = "white";
+    ctx.font = "20px 'Micro 5', sans-serif";
+    ctx.textAlign = "left";
+    ctx.fillText(`${player.energy}`, energyIconX + 40, energyIconY + 25);
 
-  ctx.fillStyle = "#555";
-  ctx.fillRect(20, 60, 300, 20);
-  ctx.fillStyle = "#0f0";
-  const progress = Math.min(player.x / LEVEL_LENGTH, 1);
-  ctx.fillRect(20, 60, 300 * progress, 20);
-  ctx.strokeStyle = "#fff";
-  ctx.strokeRect(20, 60, 300, 20);
-  ctx.fillStyle = "#fff";
-   ctx.font = "20px 'Micro 5', sans-serif";
-  ctx.textAlign = "center";
-  ctx.fillText("Progress to Boss", 170, 75);
+    const progressX = 20;
+    const progressY = 60;
+    const progressWidth = 300;
+    const progressHeight = 20;
+    ctx.fillStyle = "#555";
+    ctx.fillRect(progressX, progressY, progressWidth, progressHeight);
+    ctx.fillStyle = "#0f0";
+    const progress = Math.min(player.x / LEVEL_LENGTH, 1);
+    ctx.fillRect(progressX, progressY, progressWidth * progress, progressHeight);
+    ctx.strokeStyle = "#fff";
+    ctx.strokeRect(progressX, progressY, progressWidth, progressHeight);
+    ctx.fillStyle = "#fff";
+    ctx.font = "20px 'Micro 5', sans-serif";
+    ctx.textAlign = "center";
+    ctx.fillText("Progress to Boss", progressX + progressWidth/2, progressY + 15);
 
   ctx.fillStyle = "white";
   ctx.font = "20px 'Micro 5', sans-serif";
@@ -1138,16 +1147,19 @@ function drawGame(screenWidth, screenHeight) {
   // Рисуем босса и его интерфейс
   if (boss.isActive) {
     ctx.drawImage(layers.boss, boss.x - cameraX - boss.width / 2, boss.y - boss.height / 2, boss.width, boss.height);
-    ctx.drawImage(layers.bossHealthBar, canvas.width - 200, 50, 150, 20);
+    const healthBarX = canvas.width - 200;
+    const healthBarY = 50;
+      const healthBarWidth = 150;
+    ctx.drawImage(layers.bossHealthBar, healthBarX, healthBarY, healthBarWidth, 20);
     ctx.fillStyle = "#f00";
-    const bossHPWidth = (boss.hp / 10) * 150;
-    ctx.fillRect(canvas.width - 200, 50, bossHPWidth, 20);
+    const bossHPWidth = (boss.hp / 10) * healthBarWidth;
+    ctx.fillRect(healthBarX, healthBarY, bossHPWidth, 20);
     ctx.strokeStyle = "#fff";
-    ctx.strokeRect(canvas.width - 200, 50, 150, 20);
+    ctx.strokeRect(healthBarX, healthBarY, healthBarWidth, 20);
     ctx.fillStyle = "#fff";
      ctx.font = "20px 'Micro 5', sans-serif";
     ctx.textAlign = "center";
-    ctx.fillText(`Boss HP: ${boss.hp}/10`, canvas.width - 125, 65);
+    ctx.fillText(`Boss HP: ${boss.hp}/10`, healthBarX + healthBarWidth /2, healthBarY + 15);
   }
 
   // Рисуем предупреждение "Danger!"
@@ -1849,8 +1861,12 @@ function resetGame() {
      const screenAspectRatio = screenWidth/screenHeight
      if (screenAspectRatio > canvasAspectRatio) {
          canvasScale = screenHeight / 700;
+         canvasOffsetX = (screenWidth - 400 * canvasScale)/2;
+         canvasOffsetY = (screenHeight - 700 * canvasScale)/2;
        } else {
            canvasScale = screenWidth / 400;
+           canvasOffsetX = (screenWidth - 400 * canvasScale)/2;
+           canvasOffsetY = (screenHeight - 700 * canvasScale)/2;
      }
     player.x = -100;
     player.playerStartX = 100;
@@ -2010,15 +2026,27 @@ function gameLoop() {
 }
 
 function handleResize() {
-  canvas.width = 400;
+    canvas.width = 400;
   canvas.height = 700;
+     screenWidth = window.innerWidth;
+   screenHeight = window.innerHeight;
    const canvasAspectRatio = canvas.width / canvas.height;
-      const screenAspectRatio = window.innerWidth/window.innerHeight;
-      if (screenAspectRatio > canvasAspectRatio) {
-         canvasScale = window.innerHeight / 700;
+     const screenAspectRatio = screenWidth/screenHeight
+     if (screenAspectRatio > canvasAspectRatio) {
+         canvasScale = screenHeight / 700;
+           canvasOffsetX = (screenWidth - 400 * canvasScale)/2;
+           canvasOffsetY = (screenHeight - 700 * canvasScale)/2;
       } else {
-          canvasScale = window.innerWidth / 400;
+          canvasScale = screenWidth / 400;
+           canvasOffsetX = (screenWidth - 400 * canvasScale)/2;
+           canvasOffsetY = (screenHeight - 700 * canvasScale)/2;
       }
+
+     const uiTop = 20 / canvasScale; // Положение 20px от верхнего края
+     const uiBottom = (screenHeight / canvasScale) - 80; // Положение 80px от нижнего края
+
+      controls.style.bottom = uiBottom + "px";
+      superMeowReadyEl.style.top = uiTop + "px";
 }
 
 function getRandomInterval(min, max) {
@@ -2070,5 +2098,18 @@ function updateDashAnimations() {
 window.onload = () => {
     handleResize()
     window.addEventListener('resize', handleResize);
-    // generateInitialPlatforms(); // Убрано, так как платформы теперь генерируются при старте
+
+     // Telegram Mini Apps settings
+    if(window.Telegram) {
+         window.Telegram.WebApp.isVerticalSwipesEnabled = true;
+        if (window.Telegram.WebApp.platform === "ios") {
+             window.Telegram.WebApp.expand();
+            console.log("isFullScreen: " + window.Telegram.WebApp.isExpanded);
+          }
+
+         if(window.Telegram.WebApp.isExpanded){
+            handleResize()
+        }
+        window.Telegram.WebApp.onEvent("viewportChanged", handleResize)
+    }
 };
