@@ -12,11 +12,20 @@ body {
   justify-content: center;
   align-items: center;
   height: 100vh;
+    user-select: none; /* запрет выделения текста */
 }
 
 canvas {
     image-rendering: pixelated;
-    image-rendering: crisp-edges; /* для некоторых браузеров */
+    image-rendering: crisp-edges;
+    will-change: transform;
+    user-select: none; /* запрет выделения текста */
+}
+img {
+    image-rendering: pixelated;
+    image-rendering: crisp-edges;
+    will-change: transform;
+    user-select: none; /* запрет выделения текста */
 }
 
 
@@ -25,6 +34,7 @@ canvas {
   position: relative;
   z-index: 1;
   border: 2px solid #555;
+   user-select: none; /* запрет выделения текста */
 }
 
 .overlay {
@@ -40,20 +50,24 @@ canvas {
   justify-content: center;
   align-items: center;
   z-index: 10;
+   user-select: none; /* запрет выделения текста */
 }
 
 #startScreen, #gameOverScreen, #victoryScreen {
   display: none;
+   user-select: none; /* запрет выделения текста */
 }
 
 #startScreen {
   display: flex;
+    user-select: none; /* запрет выделения текста */
 }
 
 #victoryScreen img {
   width: 150px;
   height: 150px;
   margin-bottom: 20px;
+    user-select: none; /* запрет выделения текста */
 }
 
 button {
@@ -69,6 +83,7 @@ button {
   background-color: #28a745;
   color: white;
   transition: opacity 0.3s, background 0.3s;
+    user-select: none; /* запрет выделения текста */
 }
 
 button:hover {
@@ -87,6 +102,7 @@ button:disabled {
   display: flex;
   gap: 10px;
   z-index: 5;
+     user-select: none; /* запрет выделения текста */
 }
 
 .control-button {
@@ -104,6 +120,7 @@ button:disabled {
   position: relative;
   overflow: hidden;
   transition: opacity 0.3s, background 0.3s;
+    user-select: none; /* запрет выделения текста */
 }
 
 .control-button:disabled {
@@ -137,6 +154,7 @@ button:disabled {
   opacity: 0;
   transition: opacity 0.5s;
   z-index: 5;
+    user-select: none; /* запрет выделения текста */
 }
 
 #meowBtn.cooldown::after,
