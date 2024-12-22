@@ -359,7 +359,7 @@ document.addEventListener("mouseup", (e) => {
 });
 
 dashBtn.addEventListener("touchstart", (e) => {
-  e.preventDefault();
+   e.preventDefault();
   if (player.isDashing) return;
   const now = Date.now();
   if ((now - lastDashTime < DASH_COOLDOWN) && comboCount === 0) {
@@ -385,7 +385,7 @@ dashBtn.addEventListener("touchmove", (e) => {
 });
 
 dashBtn.addEventListener("touchend", (e) => {
-  e.preventDefault();
+   e.preventDefault();
   if (!isSwipeDashActive) return;
   isSwipeDashActive = false;
 
@@ -413,12 +413,12 @@ leftBtn.addEventListener('touchend', (e) => {
     keys.left = false;
 });
 rightBtn.addEventListener('touchstart', (e) => {
-  e.preventDefault();
+   e.preventDefault();
     keys.right = true;
     player.direction = 'right';
 });
 rightBtn.addEventListener('touchmove', (e) => {
-   e.preventDefault();
+    e.preventDefault();
 })
 rightBtn.addEventListener('touchend', (e) => {
     e.preventDefault();
@@ -589,8 +589,8 @@ function spawnWhiskasOnPlatform(platform) {
     const type = Math.random() < 0.2 ? 'super' : 'normal';
     const radius = type === 'super' ? 20 : 10;
     const whiskasX = platform.x + Math.random() * (platform.length * BLOCK_WIDTH - 40) + 20;
-      const whiskasY = platform.originalY - radius - 5;
-       if (!isWhiskasTooClose(energyItems, whiskasX, whiskasY, radius)) {
+     const whiskasY = platform.originalY - radius - 5;
+      if (!isWhiskasTooClose(energyItems, whiskasX, whiskasY, radius)) {
         energyItems.push({
           x: whiskasX,
           y: whiskasY,
@@ -608,8 +608,8 @@ function updateGame() {
   if (!gameStarted || gameOver) return;
     playMusic();
     if (gameOver && fadeAlpha < 1) {
-       fadeAlpha += 0.01;
-      return;
+     fadeAlpha += 0.01;
+     return;
     }
 
   if (skillNotReadyTime > 0) {
@@ -619,88 +619,88 @@ function updateGame() {
     }
   }
     // Обновление состояния анимации
-    if (!player.isJumping && !player.isDashing) {
-        if ((keys.left || keys.right) && Math.abs(player.velocityX) > 0.5) {
-            player.animationState = 'run';
-        } else {
-            player.animationState = 'idle';
-        }
-    }
+  if (!player.isJumping && !player.isDashing) {
+      if ((keys.left || keys.right) && Math.abs(player.velocityX) > 0.5) {
+          player.animationState = 'run';
+      } else {
+          player.animationState = 'idle';
+      }
+  }
     if (player.isJumping && player.performedDoubleJump) {
-        player.animationState = 'double_jump';
-    } else if (player.isJumping && !player.performedDoubleJump) {
-        player.animationState = 'jump';
+      player.animationState = 'double_jump';
+  } else if (player.isJumping && !player.performedDoubleJump) {
+    player.animationState = 'jump';
+  }
+   if(player.isDashing) {
+        player.animationState = 'dash';
     }
-
-    if(player.isDashing) {
-          player.animationState = 'dash';
-    }
-     if(player.isFading){
-        player.fadeTimer -= 16.67;
-        player.opacity = (player.fadeTimer / player.fadeDuration);
+    if(player.isFading){
+      player.fadeTimer -= 16.67;
+      player.opacity = (player.fadeTimer / player.fadeDuration);
         if (player.opacity > 1) player.opacity = 1;
             if(player.fadeTimer <= player.fadeDuration * 0.5){
-                   if(player.fadeTimer > 0)
-                       spawnBlissParticles();
-            }
-          if(player.fadeTimer <= 0){
-            player.isFading = false;
-              player.invulnerable = false;
-            }
-       }
-       if(!player.isFading && !player.invulnerable) {
-           player.opacity = 1;
-       }
+                if(player.fadeTimer > 0)
+                        spawnBlissParticles();
+           }
+      if(player.fadeTimer <= 0){
+        player.isFading = false;
+          player.invulnerable = false;
+        }
+     }
+      if(!player.isFading && !player.invulnerable) {
+            player.opacity = 1;
+      }
 
   // Обработка движения игрока
-  if (!player.isDashing && !player.isEntering) {
-    if (keys.right) {
-      player.velocityX = Math.min(player.velocityX + 0.5 * gameSpeed, player.maxSpeed * gameSpeed);
-      player.direction = 'right';
-    }
-    if (keys.left) {
-      player.velocityX = Math.max(player.velocityX - 0.5 * gameSpeed, -player.maxSpeed * gameSpeed);
-      player.direction = 'left';
-    }
-    if (!keys.right && !keys.left) {
-      player.velocityX *= player.friction;
-      if (Math.abs(player.velocityX) < 0.1) {
-        player.velocityX = 0;
+    if (!player.isDashing && !player.isEntering) {
+        if (keys.right) {
+            player.velocityX = Math.min(player.velocityX + 0.5 * gameSpeed, player.maxSpeed * gameSpeed);
+          player.direction = 'right';
+       }
+      if (keys.left) {
+          player.velocityX = Math.max(player.velocityX - 0.5 * gameSpeed, -player.maxSpeed * gameSpeed);
+            player.direction = 'left';
+     }
+        if (!keys.right && !keys.left) {
+            player.velocityX *= player.friction;
+           if (Math.abs(player.velocityX) < 0.1) {
+              player.velocityX = 0;
+           }
       }
-    }
   } else if (!player.isEntering){
     player.dashTimer -= 16.67;
     if (player.dashTimer <= 0) {
       endDash();
     }
   }
-   if(player.isEntering){
+    
+    if(player.isEntering){
         player.x += 3;
         if(player.x >= player.playerStartX){
             player.isEntering = false;
         }
     }
 
-  // Обновление позиции игрока
-     if(!player.isEntering){
-        player.x += player.velocityX * gameSpeed;
-      player.y += player.velocityY * gameSpeed;
-      player.velocityY += player.gravity * gameSpeed;
-     }
 
+  // Обновление позиции игрока
+    if(!player.isEntering){
+        player.x += player.velocityX * gameSpeed;
+         player.y += player.velocityY * gameSpeed;
+        player.velocityY += player.gravity * gameSpeed;
+    }
   // Обновление камеры
   let cameraTargetX;
     if(player.isEntering){
-        cameraTargetX = player.x - 100;
+        cameraTargetX = player.x - (100 / canvasScale);
       }
-   else if (boss.isActive && !boss.isFlashing) {
-    const baseCameraX = boss.x - canvas.width / (2 * canvasScale);
-       const offset = clamp(player.x - boss.x, -150, 150);
-     cameraTargetX = baseCameraX + offset;
-  } else {
-    cameraTargetX = player.x - (100 / canvasScale);
-   }
-  cameraX += (cameraTargetX - cameraX) * 0.1;
+    else if (boss.isActive && !boss.isFlashing) {
+        const baseCameraX = boss.x - canvas.width / (2 * canvasScale);
+         const offset = clamp(player.x - boss.x, -150, 150);
+        cameraTargetX = baseCameraX + offset;
+    } else {
+        cameraTargetX = player.x - (100 / canvasScale);
+      }
+      cameraX += (cameraTargetX - cameraX) * 0.1;
 
   // Проверка на приземление
   if (player.y >= GROUND_Y - player.height) {
@@ -712,42 +712,43 @@ function updateGame() {
     }
     player.canDoubleJump = true;
   }
-
-      // Вычисляем область коллизии игрока
+        
+         // Вычисляем область коллизии игрока
     const collisionX = player.x + player.collisionOffsetX;
     const collisionY = player.y + player.collisionOffsetY;
+        
 
     // Проверка коллизий с платформами и проседание
     platforms.forEach((platform) => {
-      if (
-        player.velocityY >= 0 &&
-        collisionX + player.collisionWidth > platform.x &&
-       collisionX < platform.x + platform.length * BLOCK_WIDTH &&
-          player.y + player.height >= platform.y - 5 &&
-          player.y + player.height <= platform.y + player.velocityY * gameSpeed + 1
-      ) {
-          player.y = platform.y - player.height;
-          player.velocityY = 0;
-        player.canDoubleJump = true;
-        player.performedDoubleJump = false;
-        if (player.isJumping) {
-          platform.isSinking = true;
-            player.isJumping = false;
+        if (
+            player.velocityY >= 0 &&
+           collisionX + player.collisionWidth > platform.x &&
+           collisionX < platform.x + platform.length * BLOCK_WIDTH &&
+           player.y + player.height >= platform.y - 5 &&
+            player.y + player.height <= platform.y + player.velocityY * gameSpeed + 1
+        ) {
+            player.y = platform.y - player.height;
+            player.velocityY = 0;
+           player.canDoubleJump = true;
+           player.performedDoubleJump = false;
+          if (player.isJumping) {
+            platform.isSinking = true;
+             player.isJumping = false;
+          }
         }
-      }
-
+        
         // Обработка проседания и возвращения платформы
         if (platform.isSinking) {
           platform.y += platform.sinkSpeed;
-          if (platform.y >= platform.originalY + platform.sinkAmount){
-              platform.isSinking = false;
-          }
-        } else if (platform.y > platform.originalY) {
+         if (platform.y >= platform.originalY + platform.sinkAmount){
+               platform.isSinking = false;
+           }
+      } else if (platform.y > platform.originalY) {
           platform.y -= platform.returnSpeed;
-          if (platform.y <= platform.originalY) {
-           platform.y = platform.originalY;
-          }
-        }
+           if (platform.y <= platform.originalY) {
+                platform.y = platform.originalY;
+            }
+       }
     });
 
   // Спавн метеоров и энергетических предметов
@@ -777,7 +778,7 @@ function updateGame() {
     meteor.x += meteor.speedX * gameSpeed;
     meteor.y += meteor.speedY * gameSpeed;
       const dx = meteor.x - (collisionX + player.collisionWidth / 2);
-      const dy = meteor.y - (collisionY + player.collisionHeight / 2);
+     const dy = meteor.y - (collisionY + player.collisionHeight / 2);
     const distance = Math.sqrt(dx * dx + dy * dy);
     const collisionDistance = meteor.radius + Math.max(player.collisionWidth, player.collisionHeight) / 2;
 
@@ -810,12 +811,12 @@ function updateGame() {
 
   // Обработка энергетических предметов
   energyItems.forEach((energyItem, index) => {
-    const px = collisionX + player.collisionWidth / 2;
-    const py = collisionY + player.collisionHeight / 2;
-    const dx = energyItem.x - px;
-    const dy = energyItem.y - py;
-    const dist = Math.sqrt(dx * dx + dy * dy);
-    const collisionDistance = energyItem.radius + Math.max(player.collisionWidth, player.collisionHeight) / 2;
+      const px = collisionX + player.collisionWidth / 2;
+      const py = collisionY + player.collisionHeight / 2;
+      const dx = energyItem.x - px;
+      const dy = energyItem.y - py;
+      const dist = Math.sqrt(dx * dx + dy * dy);
+      const collisionDistance = energyItem.radius + Math.max(player.collisionWidth, player.collisionHeight) / 2;
     if (dist < collisionDistance) {
       if (energyItem.type === 'super') {
         player.energy += 5;
@@ -841,21 +842,22 @@ function updateGame() {
   });
 
   // Обработка преследователей
-   if (!boss.isActive) {
+  if (!boss.isActive) {
     pursuers.forEach((pursuer, pIndex) => {
       if (!pursuer.active && pursuer.x - cameraX < canvas.width) {
         pursuer.active = true;
       }
       if (pursuer.active) {
         if (pursuer.x > collisionX) {
-          pursuer.speedX = Math.max(pursuer.speedX - pursuer.acceleration * gameSpeed, -pursuer.maxSpeed * gameSpeed);
+            pursuer.speedX = Math.max(pursuer.speedX - pursuer.acceleration * gameSpeed, -pursuer.maxSpeed * gameSpeed);
         } else {
           pursuer.speedX = Math.min(pursuer.speedX + pursuer.acceleration * gameSpeed, pursuer.maxSpeed * gameSpeed);
         }
         pursuer.x += pursuer.speedX * gameSpeed;
-          const dx = (pursuer.x + pursuer.width / 2) - (collisionX + player.collisionWidth / 2);
-          const dy = (pursuer.y - pursuer.height / 2) - (collisionY + player.collisionHeight / 2);
-          const dist = Math.sqrt(dx * dx + dy * dy);
+        
+        const dx = (pursuer.x + pursuer.width / 2) - (collisionX + player.collisionWidth / 2);
+        const dy = (pursuer.y - pursuer.height / 2) - (collisionY + player.collisionHeight / 2);
+         const dist = Math.sqrt(dx * dx + dy * dy);
         const collisionDistance = (pursuer.width / 2) + (player.collisionWidth / 2);
 
         if (dist < collisionDistance) {
@@ -911,10 +913,10 @@ function updateGame() {
   // Обновление анимаций и интерфейса
   updateAnimations();
     if(player.isDashing){
-         updateDashAnimations();
+        updateDashAnimations();
       }
     if (!player.isFading) {
-        updateBlissParticles()
+      updateBlissParticles()
     }
   updateMeowButtonCooldown();
   updateDashButtonCooldownAll();
@@ -948,11 +950,14 @@ function updateGame() {
 function updateDashButtonCooldownAll() {
 }
 
-function drawGame() {
-  ctx.clearRect(0, 0, canvas.width, canvas.height);
-    
+function drawGame(screenWidth, screenHeight) {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
     ctx.save();
-     ctx.scale(canvasScale, canvasScale);
+    const offsetX = (canvas.width - 400 * canvasScale)/2
+        const offsetY = (canvas.height - 700 * canvasScale) / 2;
+        ctx.translate(offsetX, offsetY);
+        ctx.scale(canvasScale, canvasScale);
 
   // Рисуем слои фона
   drawLayer(layers.background, cameraX * 0.2);
@@ -973,19 +978,19 @@ function drawGame() {
     const platformY = platform.y - BLOCK_HEIGHT;
     for (let i = 0; i < platform.length; i++) {
       const blockX = platform.x + i * BLOCK_WIDTH - cameraX;
-      ctx.drawImage(layers.platformBlock, blockX, platformY, BLOCK_WIDTH, BLOCK_HEIGHT);
+        ctx.drawImage(layers.platformBlock, blockX, platformY, BLOCK_WIDTH, BLOCK_HEIGHT);
 
       // Применяем эффекты платформ
       if (platform.effect !== PLATFORM_EFFECTS.NONE) {
         if (platform.effect === PLATFORM_EFFECTS.SLOW) {
           if (Math.floor(Date.now() / 200) % 2 === 0) {
             ctx.fillStyle = 'rgba(0,255,255,0.3)';
-            ctx.fillRect(blockX, platformY, BLOCK_WIDTH, BLOCK_HEIGHT);
+              ctx.fillRect(blockX, platformY, BLOCK_WIDTH, BLOCK_HEIGHT);
           }
         }
         if (platform.effect === PLATFORM_EFFECTS.SPEED) {
           if (Math.floor(Date.now() / 200) % 2 === 0) {
-            ctx.fillStyle = 'rgba(255,165,0,0.3)';
+           ctx.fillStyle = 'rgba(255,165,0,0.3)';
             ctx.fillRect(blockX, platformY, BLOCK_WIDTH, BLOCK_HEIGHT);
           }
         }
@@ -1064,12 +1069,13 @@ function drawGame() {
     ctx.fill();
     ctx.restore();
   });
-    // Рисуем частицы бдисса
-     if(!player.isFading) {
-         blissParticles.forEach(p => {
-           ctx.fillStyle = `rgba(255,255,255,${p.alpha})`;
+
+   // Рисуем частицы бдисса
+    if(!player.isFading) {
+     blissParticles.forEach(p => {
+            ctx.fillStyle = `rgba(255,255,255,${p.alpha})`;
            ctx.fillRect(p.x - cameraX, p.y, 5, 5);
-        });
+      });
     }
 
   // Рисуем полоску HP над игроком
@@ -1079,25 +1085,26 @@ function drawGame() {
   ctx.save();
     ctx.globalAlpha = player.opacity;
     let playerImage = idleFrames[idleFrameIndex];
-    if (player.animationState === 'idle') {
-        playerImage = idleFrames[idleFrameIndex];
+      if (player.animationState === 'idle') {
+          playerImage = idleFrames[idleFrameIndex];
       } else if (player.animationState === 'run') {
         playerImage = runFrames[runFrameIndex];
       } else if (player.animationState === 'jump' && !player.performedDoubleJump) {
         playerImage = jumpFrames[jumpFrameIndex];
       } else if (player.animationState === 'double_jump') {
-        playerImage = doubleJumpFrames[doubleJumpFrameIndex];
+          playerImage = doubleJumpFrames[doubleJumpFrameIndex];
       }
-      else if (player.animationState === 'dash') {
-        playerImage = dashFrames[dashFrameIndex];
-      }
+     else if (player.animationState === 'dash') {
+         playerImage = dashFrames[dashFrameIndex];
+     }
      if (player.direction === 'left') {
         ctx.scale(-1, 1);
       ctx.drawImage(playerImage, -(player.x + player.width) + cameraX, player.y, player.width, player.height);
     } else {
-      ctx.drawImage(playerImage, player.x - cameraX, player.y, player.width, player.height);
-    }
-    ctx.restore();
+       ctx.drawImage(playerImage, player.x - cameraX, player.y, player.width, player.height);
+     }
+  ctx.restore();
+
    // Рисуем область коллизии
    if (showCollisionBox) {
      drawCollisionBox();
@@ -1106,7 +1113,7 @@ function drawGame() {
   // Рисуем интерфейс
   ctx.drawImage(layers.energyIcon, 20, 20, 30, 30);
   ctx.fillStyle = "white";
-  ctx.font = "20px 'Micro 5', sans-serif";
+    ctx.font = "20px 'Micro 5', sans-serif";
   ctx.textAlign = "left";
   ctx.fillText(`${player.energy}`, 60, 45);
 
@@ -1118,7 +1125,7 @@ function drawGame() {
   ctx.strokeStyle = "#fff";
   ctx.strokeRect(20, 60, 300, 20);
   ctx.fillStyle = "#fff";
-     ctx.font = "20px 'Micro 5', sans-serif";
+   ctx.font = "20px 'Micro 5', sans-serif";
   ctx.textAlign = "center";
   ctx.fillText("Progress to Boss", 170, 75);
 
@@ -1137,7 +1144,7 @@ function drawGame() {
     ctx.strokeStyle = "#fff";
     ctx.strokeRect(canvas.width - 200, 50, 150, 20);
     ctx.fillStyle = "#fff";
-   ctx.font = "20px 'Micro 5', sans-serif";
+       ctx.font = "20px 'Micro 5', sans-serif";
     ctx.textAlign = "center";
     ctx.fillText(`Boss HP: ${boss.hp}/10`, canvas.width - 125, 65);
   }
@@ -1161,7 +1168,7 @@ function drawGame() {
     ctx.save();
     ctx.globalAlpha = ft.alpha;
     ctx.fillStyle = "#fff";
-     ctx.font = "20px 'Micro 5', sans-serif";
+    ctx.font = "20px 'Micro 5', sans-serif";
     ctx.textAlign = "center";
     ctx.fillText(ft.text, ft.x - cameraX, ft.y);
     ctx.restore();
@@ -1176,9 +1183,10 @@ function drawGame() {
   if (comboMessageAlpha > 0 && comboMessage) {
     drawComboMessage();
   }
-       if (gameOver && fadeAlpha > 0) {
-      ctx.fillStyle = `rgba(0,0,0,${fadeAlpha})`;
-         ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+    if (gameOver && fadeAlpha > 0) {
+    ctx.fillStyle = `rgba(0,0,0,${fadeAlpha})`;
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
     }
        ctx.restore(); // Завершаем масштабирование канваса
 }
@@ -1267,10 +1275,10 @@ function updateBoss() {
       if (shot.speed > 0) {
         shot.x += shot.vx * gameSpeed;
         shot.y += shot.vy * gameSpeed;
-        const dx = shot.x - (player.x + player.width / 2);
+          const dx = shot.x - (player.x + player.width / 2);
         const dy = shot.y - (player.y + player.height / 2);
         const dist = Math.sqrt(dx * dx + dy * dy);
-        const collisionDistance = shot.radius + Math.max(player.collisionWidth, player.collisionHeight) / 2;
+          const collisionDistance = shot.radius + Math.max(player.collisionWidth, player.collisionHeight) / 2;
         if (dist < collisionDistance) {
           playerTakeDamage(15);
           boss.shots.splice(sIndex, 1);
@@ -1288,11 +1296,11 @@ function updateBoss() {
       shot.y += shot.speed * Math.sin(shot.angle) * gameSpeed;
         const dx = shot.x - (player.x + player.width / 2);
         const dy = shot.y - (player.y + player.height / 2);
-        const dist = Math.sqrt(dx * dx + dy * dy);
+         const dist = Math.sqrt(dx * dx + dy * dy);
         const collisionDistance = shot.radius + Math.max(player.collisionWidth, player.collisionHeight) / 2;
       if (dist < collisionDistance) {
-         playerTakeDamage(15);
-        boss.shots.splice(sIndex, 1);
+          playerTakeDamage(15);
+          boss.shots.splice(sIndex, 1);
       }
       if (
         shot.x - cameraX < -shot.radius || shot.x - cameraX > canvas.width + shot.radius ||
@@ -1304,11 +1312,11 @@ function updateBoss() {
   });
 
   // Проверка столкновения игрока с боссом
-    const dxB = boss.x - (player.x + player.width / 2);
-    const dyB = boss.y - (player.y + player.height / 2);
+      const dxB = boss.x - (player.x + player.width / 2);
+      const dyB = boss.y - (player.y + player.height / 2);
     const distB = Math.sqrt(dxB * dxB + dyB * dyB);
-    const collisionDistB = (boss.width / 2 + player.width / 2);
-  /*if (distB < collisionDistB) {
+      const collisionDistB = (boss.width / 2 + player.width / 2);
+ /* if (distB < collisionDistB) {
     if (player.y + player.height <= boss.y - boss.height / 4) {
       boss.hp -= 2;
       if (boss.hp <= 0) {
@@ -1402,20 +1410,20 @@ function isWhiskasTooClose(items, x, y, radius) {
 }
 
 function spawnWhiskasOnGround() {
-   for (let i = 0; i < 3; i++) {
-       let gx = player.x + (Math.random() * 400 - 200);
-       if (gx < cameraX) gx = cameraX + 50;
-       const whiskasY = GROUND_Y - 10;
-      const whiskasX = gx;
-      if (!isWhiskasTooClose(energyItems, whiskasX, whiskasY, 10)) {
-        energyItems.push({
-          x: gx,
-          y: whiskasY,
-         radius: 10,
-           type: 'normal',
+  for (let i = 0; i < 3; i++) {
+     let gx = player.x + (Math.random() * 400 - 200);
+     if (gx < cameraX) gx = cameraX + 50;
+      const whiskasY = GROUND_Y - 10;
+       const whiskasX = gx;
+        if (!isWhiskasTooClose(energyItems, whiskasX, whiskasY, 10)) {
+         energyItems.push({
+           x: gx,
+            y: whiskasY,
+            radius: 10,
+             type: 'normal',
         });
-      }
-   }
+       }
+    }
 }
 
 function spawnMeteor() {
@@ -1446,21 +1454,21 @@ function spawnEnergy() {
     // Спавн на платформе
     if (platforms.length > 0) {
       const platform = platforms[Math.floor(Math.random() * platforms.length)];
-        const whiskasY = platform.originalY - 15;
-       const whiskasX = platform.x + Math.random() * (platform.length * BLOCK_WIDTH - 40) + 20;
-         if (!isWhiskasTooClose(energyItems, whiskasX, whiskasY, 10)) {
-             const type = Math.random() < 0.1 ? 'super' : 'normal';
-              const radius = type === 'super' ? 20 : 10;
-             energyItems.push({ x: whiskasX, y: whiskasY, radius, type });
-      }
+     const whiskasY = platform.originalY - 15;
+      const whiskasX = platform.x + Math.random() * (platform.length * BLOCK_WIDTH - 40) + 20;
+        if (!isWhiskasTooClose(energyItems, whiskasX, whiskasY, 10)) {
+           const type = Math.random() < 0.1 ? 'super' : 'normal';
+          const radius = type === 'super' ? 20 : 10;
+          energyItems.push({ x: whiskasX, y: whiskasY, radius, type });
+       }
     }
   } else {
     // Спавн в воздухе между платформами
     const midX = player.x + canvas.width / 2 + Math.random() * 300;
     const midY = GROUND_Y - PLATFORM_VERTICAL_SPACING * 1.5;
      if (!isWhiskasTooClose(energyItems, midX, midY - 5, 10)) {
-       energyItems.push({ x: midX, y: midY - 5, radius: 10, type: 'normal' });
-      }
+      energyItems.push({ x: midX, y: midY - 5, radius: 10, type: 'normal' });
+     }
   }
 }
 
@@ -1536,7 +1544,7 @@ function updateMeowButtonCooldown() {
     const percentage = (skillCooldown - timeSinceLastMeow) / skillCooldown;
     meowBtn.disabled = true;
     meowBtn.classList.add('cooldown');
-     meowBtn.style.background = `linear-gradient(to right, rgba(255,255,255,0.3) ${percentage * 100}%, rgba(255,255,255,0) ${percentage * 100}%)`;
+      meowBtn.style.background = `linear-gradient(to right, rgba(255,255,255,0.3) ${percentage * 100}%, rgba(255,255,255,0) ${percentage * 100}%)`;
   } else {
     meowBtn.disabled = false;
     meowBtn.classList.remove('cooldown');
@@ -1545,19 +1553,19 @@ function updateMeowButtonCooldown() {
 }
 
 function handleSkill() {
-  if (!player.alive || gameOver || player.isFading) return;
-  const now = Date.now();
+     if (!player.alive || gameOver || player.isFading) return;
+    const now = Date.now();
      if (now - lastSkillTime < skillCooldown) {
         showSkillNotReady();
        return;
-   }
-   player.isFading = true;
-   player.fadeTimer = player.fadeDuration;
-    player.invulnerable = true;
-   lastSkillTime = now;
-   spawnBlissParticles();
-    createNormalMeow()
-   updateMeowButtonCooldown();
+    }
+     player.isFading = true;
+    player.fadeTimer = player.fadeDuration;
+   player.invulnerable = true;
+    lastSkillTime = now;
+    spawnBlissParticles();
+      createNormalMeow()
+  updateMeowButtonCooldown();
 }
 
 
@@ -1615,8 +1623,8 @@ function performSwipeDash(angle) {
 
   player.isDashing = true;
   player.dashTimer = DASH_DURATION;
-  player.invulnerable  = true;
-    player.animationState = 'dash';
+  player.invulnerable = true;
+      player.animationState = 'dash';
 
   if (comboCount === 0) {
     lastDashTime = Date.now();
@@ -1647,10 +1655,10 @@ function endDash() {
   if (lastDashKill) {
     comboCount++;
     lastDashTime = 0;
-        if (comboCount >= 5) {
-        player.hp = Math.min(player.hp + 5, 100);
-          spawnFloatingText("+5HP", player.x + player.width / 2, player.y - 50);
-       }
+       if (comboCount >= 5) {
+       player.hp = Math.min(player.hp + 5, 100);
+        spawnFloatingText("+5HP", player.x + player.width / 2, player.y - 50);
+      }
     showComboText();
   } else {
     comboCount = 0;
@@ -1699,22 +1707,22 @@ function showSkillNotReady() {
 }
 
 function drawComboMessage() {
-    ctx.save();
-      ctx.font = "bold 36px 'Micro 5', sans-serif";
-  const colors = ["red", "yellow", "blue", "lime", "magenta"];
-   const colorIndex = Math.floor(Date.now() / 200) % colors.length;
-  ctx.fillStyle = `rgba(${colors[colorIndex]},${comboMessageAlpha})`;
-  ctx.textAlign = "center";
-  const posX = canvas.width / (2 * canvasScale);
-  const posY = canvas.height * 0.25 / canvasScale;
-  ctx.fillText(comboMessage, posX, posY);
-  ctx.restore();
+  ctx.save();
+    ctx.font = "bold 36px 'Micro 5', sans-serif";
+    const colors = ["red", "yellow", "blue", "lime", "magenta"];
+    const colorIndex = Math.floor(Date.now() / 200) % colors.length;
+    ctx.fillStyle = `rgba(${colors[colorIndex]},${comboMessageAlpha})`;
+    ctx.textAlign = "center";
+    const posX = canvas.width / (2 * canvasScale);
+    const posY = canvas.height * 0.25 / canvasScale;
+    ctx.fillText(comboMessage, posX, posY);
+    ctx.restore();
 }
 
 function drawPlayerHpBar() {
-    const barWidth = 50;
+  const barWidth = 50;
   const barHeight = 5;
-    const x = (player.x + player.width / 2 - barWidth / 2 - cameraX) / canvasScale;
+    const x = (player.x + player.width / 2 - cameraX - barWidth / 2) / canvasScale;
     const y = player.y / canvasScale - 20;
 
   // Основа полоски (черный)
@@ -1731,9 +1739,9 @@ function drawCollisionBox() {
   if(!showCollisionBox) return;
     ctx.strokeStyle = 'green';
       ctx.lineWidth = 1;
-      const collisionX = (player.x + player.collisionOffsetX - cameraX)/canvasScale;
-      const collisionY = (player.y + player.collisionOffsetY)/canvasScale;
-      ctx.strokeRect(collisionX, collisionY, player.collisionWidth/canvasScale, player.collisionHeight/canvasScale);
+      const collisionX = (player.x + player.collisionOffsetX - cameraX) / canvasScale;
+      const collisionY = (player.y + player.collisionOffsetY) / canvasScale;
+      ctx.strokeRect(collisionX, collisionY, player.collisionWidth / canvasScale, player.collisionHeight / canvasScale);
 }
 
 function playerTakeDamage(amount) {
@@ -1788,28 +1796,28 @@ function spawnBlissParticles(){
   for (let i = 0; i < blissSpawnRate; i++) {
     const angle = Math.random() * Math.PI * 2;
       const speed = Math.random() * 2 + 1;
-        const x = player.x + player.width / 2 + Math.cos(angle) * 20;
-       const y = player.y + player.height / 2 + Math.sin(angle) * 20;
-      blissParticles.push({
-          x: x,
-          y: y,
-        vx: Math.cos(angle) * speed,
-        vy: Math.sin(angle) * speed,
+      const x = player.x + player.width / 2 + Math.cos(angle) * 20;
+     const y = player.y + player.height / 2 + Math.sin(angle) * 20;
+     blissParticles.push({
+        x: x,
+         y: y,
+         vx: Math.cos(angle) * speed,
+         vy: Math.sin(angle) * speed,
         alpha: 1,
-         initialTime: Date.now(),
-      });
-  }
+           initialTime: Date.now(),
+       });
+   }
 }
 
 function updateBlissParticles(){
     blissParticles.forEach((p, i) => {
     const elapsed = Date.now() - p.initialTime;
     const duration = 500;
-      if(elapsed > duration) {
-         blissParticles.splice(i, 1);
+     if(elapsed > duration) {
+       blissParticles.splice(i, 1);
       } else {
         p.alpha = 1 - (elapsed/duration);
-         p.x += p.vx * gameSpeed;
+        p.x += p.vx * gameSpeed;
         p.y += p.vy * gameSpeed;
       }
   });
@@ -1832,17 +1840,17 @@ function restartGame() {
 }
 
 function resetGame() {
-     canvas.width = window.innerWidth;
-    canvas.height = window.innerHeight;
-    const canvasAspectRatio = canvas.width / canvas.height;
-      const gameAspectRatio = 600 / 700
     
-      if (canvasAspectRatio > gameAspectRatio) {
-            canvasScale = canvas.height / 700;
-      } else {
-          canvasScale = canvas.width / 600;
-       }
-    player.x = -100;
+  canvas.width = 400;
+  canvas.height = 700;
+      const canvasAspectRatio = canvas.width / canvas.height;
+     const screenAspectRatio = window.innerWidth/window.innerHeight
+  if (screenAspectRatio > canvasAspectRatio) {
+        canvasScale = window.innerHeight / 700;
+   } else {
+       canvasScale = window.innerWidth / 400;
+  }
+  player.x = -100;
   player.playerStartX = 100;
   player.y = GROUND_Y - player.height;
   player.velocityY = 0;
@@ -1850,15 +1858,15 @@ function resetGame() {
   player.energy = 0;
   player.superMeowReady = false;
   player.alive = true;
-    player.hp = 100;
-     // Вычисляем область коллизии игрока
-     player.collisionWidth = player.width * 0.85;
-     player.collisionHeight = player.height * 0.85;
-      player.collisionOffsetX = (player.width - player.collisionWidth) / 2;
-     player.collisionOffsetY = (player.height - player.collisionHeight) / 2;
+  player.hp = 100;
+    // Вычисляем область коллизии игрока
+    player.collisionWidth = player.width * 0.85;
+    player.collisionHeight = player.height * 0.85;
+    player.collisionOffsetX = (player.width - player.collisionWidth) / 2;
+    player.collisionOffsetY = (player.height - player.collisionHeight) / 2;
     player.isEntering = true;
-       player.isFading = false;
-      player.fadeTimer = 0;
+    player.isFading = false;
+    player.fadeTimer = 0;
     player.skillOpacity = 1;
   player.direction = 'right';
   player.animationState = 'idle';
@@ -1878,7 +1886,8 @@ function resetGame() {
   floatingTexts = [];
   damageParticles = [];
       blissParticles = [];
-      fadeAlpha = 0;
+     fadeAlpha = 0;
+
 
   cameraX = -200;
   spawnTimer = Date.now();
@@ -1890,7 +1899,6 @@ function resetGame() {
   victory = false;
       
      document.body.style.overflow = 'hidden';
-
   clearInterval(timerInterval);
   gameTimer = 60;
   startTimer();
@@ -1912,7 +1920,6 @@ function resetGame() {
   lastMeowTime = 0;
   lastDashTime = 0;
     lastSkillTime = 0;
-
   comboCount = 0;
   lastDashKill = false;
   skillNotReadyAlpha = 0;
@@ -1997,15 +2004,14 @@ function gameLoop() {
   }
 }
 function handleResize() {
-    canvas.width = window.innerWidth;
-    canvas.height = window.innerHeight;
-      const canvasAspectRatio = canvas.width / canvas.height;
-        const gameAspectRatio = 600 / 700
-
-      if (canvasAspectRatio > gameAspectRatio) {
-            canvasScale = canvas.height / 700;
-      } else {
-            canvasScale = canvas.width / 600;
+  canvas.width = 400;
+  canvas.height = 700;
+    const canvasAspectRatio = canvas.width / canvas.height;
+      const screenAspectRatio = window.innerWidth/window.innerHeight;
+      if (screenAspectRatio > canvasAspectRatio) {
+            canvasScale = window.innerHeight / 700;
+        } else {
+            canvasScale = window.innerWidth / 400;
       }
 }
 
@@ -2047,8 +2053,8 @@ function updateAnimations() {
 function updateDashAnimations() {
      dashFrameTimer++;
      if (dashFrameTimer >= dashFrameInterval) {
-         dashFrameTimer = 0;
-         dashFrameIndex = (dashFrameIndex + 1) % dashFrames.length;
+       dashFrameTimer = 0;
+        dashFrameIndex = (dashFrameIndex + 1) % dashFrames.length;
     }
 }
 
@@ -2056,7 +2062,7 @@ function updateDashAnimations() {
 // 13. Запуск игры при загрузке
 // =============================
 window.onload = () => {
-  handleResize()
-   window.addEventListener('resize', handleResize);
+    handleResize()
+    window.addEventListener('resize', handleResize);
   // generateInitialPlatforms(); // Убрано, так как платформы теперь генерируются при старте
 };
