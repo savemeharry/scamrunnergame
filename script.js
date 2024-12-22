@@ -55,6 +55,7 @@ let gameOver = false;
 let gameStarted = false;
 let victory = false;
 let fadeAlpha = 0;
+let canvasScale = 1; // Масштаб канваса
 
 let isSwipeDashActive = false;
 let dashStart = { x: 0, y: 0 };
@@ -194,7 +195,7 @@ let showCollisionBox = 0; // Управление отображением бо�
 
 let player = {
   x: -100,
-    playerStartX: 100,
+  playerStartX: 100,
   y: GROUND_Y - 70,
   width: 64,
   height: 94,
@@ -215,10 +216,10 @@ let player = {
     collisionOffsetX: 0,
     collisionOffsetY: 0,
     isEntering: true,
-      isFading: false,
+    isFading: false,
     fadeTimer: 0,
     fadeDuration: 1500,
-    skillOpacity: 1,
+  skillOpacity: 1,
   direction: 'right',
   isJumping: false,
   isDashing: false,
@@ -358,6 +359,7 @@ document.addEventListener("mouseup", (e) => {
 });
 
 dashBtn.addEventListener("touchstart", (e) => {
+   e.preventDefault();
   if (player.isDashing) return;
   const now = Date.now();
   if ((now - lastDashTime < DASH_COOLDOWN) && comboCount === 0) {
@@ -375,13 +377,15 @@ dashBtn.addEventListener("touchstart", (e) => {
 });
 
 dashBtn.addEventListener("touchmove", (e) => {
+    e.preventDefault();
   if (!isSwipeDashActive) return;
   const touch = e.touches[0];
   dashCurrent.x = touch.clientX;
   dashCurrent.y = touch.clientY;
 });
 
-dashBtn.addEventListener("touchend", () => {
+dashBtn.addEventListener("touchend", (e) => {
+   e.preventDefault();
   if (!isSwipeDashActive) return;
   isSwipeDashActive = false;
 
@@ -393,6 +397,32 @@ dashBtn.addEventListener("touchend", () => {
 
   const angle = Math.atan2(dy, dx);
   performSwipeDash(angle);
+});
+
+// Добавил touchstart/touchmove/touchend на кнопки влево и вправо
+leftBtn.addEventListener('touchstart', (e) => {
+    e.preventDefault();
+    keys.left = true;
+    player.direction = 'left';
+});
+leftBtn.addEventListener('touchmove', (e) => {
+  e.preventDefault();
+})
+leftBtn.addEventListener('touchend', (e) => {
+  e.preventDefault();
+    keys.left = false;
+});
+rightBtn.addEventListener('touchstart', (e) => {
+  e.preventDefault();
+    keys.right = true;
+    player.direction = 'right';
+});
+rightBtn.addEventListener('touchmove', (e) => {
+   e.preventDefault();
+})
+rightBtn.addEventListener('touchend', (e) => {
+   e.preventDefault();
+    keys.right = false;
 });
 
 // =============================
@@ -498,7 +528,7 @@ function generateLevelWhiskas(platforms){
       const radius = type === 'super' ? 20 : 10;
       const whiskasX = platform.x + Math.random() * (platform.length * BLOCK_WIDTH - 40) + 20;
       const whiskasY = platform.originalY - radius - 5;
-      if (!isWhiskasTooClose(allWhiskas, whiskasX, whiskasY, radius)) {
+       if (!isWhiskasTooClose(allWhiskas, whiskasX, whiskasY, radius)) {
         allWhiskas.push({
           x: whiskasX,
           y: whiskasY,
@@ -559,14 +589,14 @@ function spawnWhiskasOnPlatform(platform) {
     const type = Math.random() < 0.2 ? 'super' : 'normal';
     const radius = type === 'super' ? 20 : 10;
     const whiskasX = platform.x + Math.random() * (platform.length * BLOCK_WIDTH - 40) + 20;
-      const whiskasY = platform.originalY - radius - 5;
-     if (!isWhiskasTooClose(energyItems, whiskasX, whiskasY, radius)) {
-      energyItems.push({
-        x: whiskasX,
-        y: whiskasY,
-        radius: radius,
-        type: type,
-      });
+    const whiskasY = platform.originalY - radius - 5;
+      if (!isWhiskasTooClose(energyItems, whiskasX, whiskasY, radius)) {
+        energyItems.push({
+          x: whiskasX,
+          y: whiskasY,
+          radius: radius,
+          type: type,
+        });
     }
   }
 }
@@ -576,12 +606,11 @@ function spawnWhiskasOnPlatform(platform) {
 // =============================
 function updateGame() {
   if (!gameStarted || gameOver) return;
-  playMusic();
-  if (gameOver && fadeAlpha < 1) {
-    fadeAlpha += 0.01;
-       return;
+    playMusic();
+    if (gameOver && fadeAlpha < 1) {
+      fadeAlpha += 0.01;
+        return;
     }
-
 
   if (skillNotReadyTime > 0) {
     skillNotReadyTime -= 16.67;
@@ -589,7 +618,7 @@ function updateGame() {
       skillNotReadyAlpha = 0;
     }
   }
-  // Обновление состояния анимации
+    // Обновление состояния анимации
   if (!player.isJumping && !player.isDashing) {
       if ((keys.left || keys.right) && Math.abs(player.velocityX) > 0.5) {
           player.animationState = 'run';
@@ -598,31 +627,32 @@ function updateGame() {
       }
   }
     if (player.isJumping && player.performedDoubleJump) {
-      player.animationState = 'double_jump';
-  } else if (player.isJumping && !player.performedDoubleJump) {
-    player.animationState = 'jump';
-  }
+        player.animationState = 'double_jump';
+    } else if (player.isJumping && !player.performedDoubleJump) {
+        player.animationState = 'jump';
+    }
     
-  if(player.isDashing) {
+    if(player.isDashing) {
         player.animationState = 'dash';
-  }
+    }
     
     if(player.isFading){
         player.fadeTimer -= 16.67;
         player.opacity = (player.fadeTimer / player.fadeDuration);
         if (player.opacity > 1) player.opacity = 1;
-            if(player.fadeTimer <= player.fadeDuration * 0.5){
-                  if(player.fadeTimer > 0)
+             if(player.fadeTimer <= player.fadeDuration * 0.5){
+                   if(player.fadeTimer > 0)
                         spawnBlissParticles();
             }
-      if(player.fadeTimer <= 0){
-        player.isFading = false;
-          player.invulnerable = false;
-        }
+          if(player.fadeTimer <= 0){
+            player.isFading = false;
+              player.invulnerable = false;
+            }
+       }
+    
+    if(!player.isFading && !player.invulnerable) {
+        player.opacity = 1;
     }
-      if(!player.isFading && !player.invulnerable) {
-          player.opacity = 1;
-      }
 
   // Обработка движения игрока
   if (!player.isDashing && !player.isEntering) {
@@ -647,24 +677,23 @@ function updateGame() {
     }
   }
     
-    if(player.isEntering){
+     if(player.isEntering){
         player.x += 3;
-        if(player.x >= player.playerStartX){
-            player.isEntering = false;
+         if(player.x >= player.playerStartX){
+          player.isEntering = false;
         }
-    }
+     }
 
   // Обновление позиции игрока
-     if(!player.isEntering){
-      player.x += player.velocityX * gameSpeed;
+    if(!player.isEntering){
+       player.x += player.velocityX * gameSpeed;
       player.y += player.velocityY * gameSpeed;
         player.velocityY += player.gravity * gameSpeed;
     }
-   
 
   // Обновление камеры
   let cameraTargetX;
-    if(player.isEntering){
+      if(player.isEntering){
         cameraTargetX = player.x - 100;
     }
   else if (boss.isActive && !boss.isFlashing) {
@@ -686,26 +715,26 @@ function updateGame() {
     }
     player.canDoubleJump = true;
   }
-    
-        // Вычисляем область коллизии игрока
+
+      // Вычисляем область коллизии игрока
     const collisionX = player.x + player.collisionOffsetX;
     const collisionY = player.y + player.collisionOffsetY;
 
     // Проверка коллизий с платформами и проседание
     platforms.forEach((platform) => {
         if (
-          player.velocityY >= 0 &&
-          collisionX + player.collisionWidth > platform.x &&
-          collisionX < platform.x + platform.length * BLOCK_WIDTH &&
+            player.velocityY >= 0 &&
+            collisionX + player.collisionWidth > platform.x &&
+           collisionX < platform.x + platform.length * BLOCK_WIDTH &&
             player.y + player.height >= platform.y - 5 &&
            player.y + player.height <= platform.y + player.velocityY * gameSpeed + 1
         ) {
-          player.y = platform.y - player.height;
-          player.velocityY = 0;
-          player.canDoubleJump = true;
-          player.performedDoubleJump = false;
+            player.y = platform.y - player.height;
+            player.velocityY = 0;
+            player.canDoubleJump = true;
+            player.performedDoubleJump = false;
           if (player.isJumping) {
-            platform.isSinking = true; // Платформа проседает при приземлении
+            platform.isSinking = true;
             player.isJumping = false;
           }
         }
@@ -723,6 +752,7 @@ function updateGame() {
           }
         }
     });
+      
 
   // Спавн метеоров и энергетических предметов
   if (!boss.isActive) {
@@ -784,8 +814,8 @@ function updateGame() {
 
   // Обработка энергетических предметов
   energyItems.forEach((energyItem, index) => {
-      const px = collisionX + player.collisionWidth / 2;
-      const py = collisionY + player.collisionHeight / 2;
+    const px = collisionX + player.collisionWidth / 2;
+    const py = collisionY + player.collisionHeight / 2;
     const dx = energyItem.x - px;
     const dy = energyItem.y - py;
     const dist = Math.sqrt(dx * dx + dy * dy);
@@ -815,23 +845,23 @@ function updateGame() {
   });
 
   // Обработка преследователей
-  if (!boss.isActive) {
+   if (!boss.isActive) {
     pursuers.forEach((pursuer, pIndex) => {
       if (!pursuer.active && pursuer.x - cameraX < canvas.width) {
         pursuer.active = true;
       }
       if (pursuer.active) {
-          if (pursuer.x > collisionX) {
-              pursuer.speedX = Math.max(pursuer.speedX - pursuer.acceleration * gameSpeed, -pursuer.maxSpeed * gameSpeed);
-          } else {
-              pursuer.speedX = Math.min(pursuer.speedX + pursuer.acceleration * gameSpeed, pursuer.maxSpeed * gameSpeed);
-          }
+        if (pursuer.x > collisionX) {
+          pursuer.speedX = Math.max(pursuer.speedX - pursuer.acceleration * gameSpeed, -pursuer.maxSpeed * gameSpeed);
+        } else {
+          pursuer.speedX = Math.min(pursuer.speedX + pursuer.acceleration * gameSpeed, pursuer.maxSpeed * gameSpeed);
+        }
         pursuer.x += pursuer.speedX * gameSpeed;
-        
-          const dx = (pursuer.x + pursuer.width / 2) - (collisionX + player.collisionWidth / 2);
+      
+        const dx = (pursuer.x + pursuer.width / 2) - (collisionX + player.collisionWidth / 2);
           const dy = (pursuer.y - pursuer.height / 2) - (collisionY + player.collisionHeight / 2);
           const dist = Math.sqrt(dx * dx + dy * dy);
-          const collisionDistance = (pursuer.width / 2) + (player.collisionWidth / 2);
+        const collisionDistance = (pursuer.width / 2) + (player.collisionWidth / 2);
 
         if (dist < collisionDistance) {
           if (player.isDashing) {
@@ -885,12 +915,12 @@ function updateGame() {
 
   // Обновление анимаций и интерфейса
   updateAnimations();
-    if(player.isDashing){
-         updateDashAnimations();
+      if(player.isDashing){
+          updateDashAnimations();
       }
-      if (!player.isFading) {
-        updateBlissParticles()
-    }
+     if (!player.isFading) {
+         updateBlissParticles()
+      }
   updateMeowButtonCooldown();
   updateDashButtonCooldownAll();
   updateComboMessage();
@@ -925,6 +955,9 @@ function updateDashButtonCooldownAll() {
 
 function drawGame() {
   ctx.clearRect(0, 0, canvas.width, canvas.height);
+    
+    ctx.save();
+     ctx.scale(canvasScale, canvasScale);
 
   // Рисуем слои фона
   drawLayer(layers.background, cameraX * 0.2);
@@ -1036,23 +1069,21 @@ function drawGame() {
     ctx.fill();
     ctx.restore();
   });
-    
      // Рисуем частицы бдисса
-    if(!player.isFading) {
-      blissParticles.forEach(p => {
-            ctx.fillStyle = `rgba(255,255,255,${p.alpha})`;
-        ctx.fillRect(p.x - cameraX, p.y, 5, 5);
-    });
-    }
-
+      if(!player.isFading) {
+    blissParticles.forEach(p => {
+      ctx.fillStyle = `rgba(255,255,255,${p.alpha})`;
+      ctx.fillRect(p.x - cameraX, p.y, 5, 5);
+   });
+   }
 
   // Рисуем полоску HP над игроком
   drawPlayerHpBar();
     
   // Рисуем игрока
    ctx.save();
-     ctx.globalAlpha = player.opacity;
-  let playerImage = idleFrames[idleFrameIndex];
+    ctx.globalAlpha = player.opacity;
+    let playerImage = idleFrames[idleFrameIndex];
     if (player.animationState === 'idle') {
         playerImage = idleFrames[idleFrameIndex];
       } else if (player.animationState === 'run') {
@@ -1062,26 +1093,25 @@ function drawGame() {
       } else if (player.animationState === 'double_jump') {
           playerImage = doubleJumpFrames[doubleJumpFrameIndex];
       }
-      else if (player.animationState === 'dash') {
+    else if (player.animationState === 'dash') {
         playerImage = dashFrames[dashFrameIndex];
-     }
+    }
     if (player.direction === 'left') {
         ctx.scale(-1, 1);
       ctx.drawImage(playerImage, -(player.x + player.width) + cameraX, player.y, player.width, player.height);
-    } else {
-       ctx.drawImage(playerImage, player.x - cameraX, player.y, player.width, player.height);
-    }
-  ctx.restore();
+     } else {
+         ctx.drawImage(playerImage, player.x - cameraX, player.y, player.width, player.height);
+     }
+   ctx.restore();
 
    // Рисуем область коллизии
    if (showCollisionBox) {
      drawCollisionBox();
    }
-
   // Рисуем интерфейс
   ctx.drawImage(layers.energyIcon, 20, 20, 30, 30);
   ctx.fillStyle = "white";
-      ctx.font = "20px 'Micro 5', sans-serif";
+    ctx.font = "20px 'Micro 5', sans-serif";
   ctx.textAlign = "left";
   ctx.fillText(`${player.energy}`, 60, 45);
 
@@ -1120,7 +1150,7 @@ function drawGame() {
   // Рисуем предупреждение "Danger!"
   if (showDanger) {
     ctx.fillStyle = `rgba(255,0,0,${dangerAlpha})`;
-     ctx.font = "20px 'Micro 5', sans-serif";
+       ctx.font = "20px 'Micro 5', sans-serif";
     ctx.textAlign = "right";
     ctx.fillText("Danger!", canvas.width - 10, canvas.height / 2 - 30);
     ctx.beginPath();
@@ -1136,7 +1166,7 @@ function drawGame() {
     ctx.save();
     ctx.globalAlpha = ft.alpha;
     ctx.fillStyle = "#fff";
-        ctx.font = "20px 'Micro 5', sans-serif";
+    ctx.font = "20px 'Micro 5', sans-serif";
     ctx.textAlign = "center";
     ctx.fillText(ft.text, ft.x - cameraX, ft.y);
     ctx.restore();
@@ -1152,13 +1182,12 @@ function drawGame() {
     drawComboMessage();
   }
       
-     if (gameOver && fadeAlpha > 0) {
-      ctx.fillStyle = `rgba(0,0,0,${fadeAlpha})`;
-        ctx.fillRect(0, 0, canvas.width, canvas.height);
+  if (gameOver && fadeAlpha > 0) {
+    ctx.fillStyle = `rgba(0,0,0,${fadeAlpha})`;
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
     }
-
+       ctx.restore(); // Завершаем масштабирование канваса
 }
-
 // =============================
 // 4. Логика Босса
 // =============================
@@ -1233,7 +1262,7 @@ function updateBoss() {
     } else if (shot.newAttack) {
       shot.timer -= 16.67;
       if (shot.timer <= 0 && shot.speed === 0) {
-        const dx = (player.x + player.width / 2) - shot.x;
+          const dx = (player.x + player.width / 2) - shot.x;
         const dy = (player.y + player.height / 2) - shot.y;
         const dist = Math.sqrt(dx * dx + dy * dy);
         shot.vx = (dx / dist) * 8;
@@ -1243,7 +1272,7 @@ function updateBoss() {
       if (shot.speed > 0) {
         shot.x += shot.vx * gameSpeed;
         shot.y += shot.vy * gameSpeed;
-        const dx = shot.x - (player.x + player.width / 2);
+          const dx = shot.x - (player.x + player.width / 2);
         const dy = shot.y - (player.y + player.height / 2);
         const dist = Math.sqrt(dx * dx + dy * dy);
         const collisionDistance = shot.radius + Math.max(player.collisionWidth, player.collisionHeight) / 2;
@@ -1262,10 +1291,10 @@ function updateBoss() {
       shot.angle += shot.angularSpeed * gameSpeed;
       shot.x += shot.speed * Math.cos(shot.angle) * gameSpeed;
       shot.y += shot.speed * Math.sin(shot.angle) * gameSpeed;
-       const dx = shot.x - (player.x + player.width / 2);
-      const dy = shot.y - (player.y + player.height / 2);
-      const dist = Math.sqrt(dx * dx + dy * dy);
-      const collisionDistance = shot.radius + Math.max(player.collisionWidth, player.collisionHeight) / 2;
+         const dx = shot.x - (player.x + player.width / 2);
+        const dy = shot.y - (player.y + player.height / 2);
+        const dist = Math.sqrt(dx * dx + dy * dy);
+        const collisionDistance = shot.radius + Math.max(player.collisionWidth, player.collisionHeight) / 2;
       if (dist < collisionDistance) {
           playerTakeDamage(15);
         boss.shots.splice(sIndex, 1);
@@ -1378,19 +1407,19 @@ function isWhiskasTooClose(items, x, y, radius) {
 }
 
 function spawnWhiskasOnGround() {
-     for (let i = 0; i < 3; i++) {
+   for (let i = 0; i < 3; i++) {
         let gx = player.x + (Math.random() * 400 - 200);
         if (gx < cameraX) gx = cameraX + 50;
         const whiskasY = GROUND_Y - 10;
         const whiskasX = gx;
-         if (!isWhiskasTooClose(energyItems, whiskasX, whiskasY, 10)) {
-          energyItems.push({
+      if (!isWhiskasTooClose(energyItems, whiskasX, whiskasY, 10)) {
+           energyItems.push({
              x: gx,
              y: whiskasY,
              radius: 10,
-            type: 'normal',
-         });
-       }
+             type: 'normal',
+           });
+     }
     }
 }
 
@@ -1422,19 +1451,19 @@ function spawnEnergy() {
     // Спавн на платформе
     if (platforms.length > 0) {
       const platform = platforms[Math.floor(Math.random() * platforms.length)];
-      const whiskasY = platform.originalY - 15;
-      const whiskasX = platform.x + Math.random() * (platform.length * BLOCK_WIDTH - 40) + 20;
-      if (!isWhiskasTooClose(energyItems, whiskasX, whiskasY, 10)) {
-        const type = Math.random() < 0.1 ? 'super' : 'normal';
-        const radius = type === 'super' ? 20 : 10;
-        energyItems.push({ x: whiskasX, y: whiskasY, radius, type });
-      }
+        const whiskasY = platform.originalY - 15;
+        const whiskasX = platform.x + Math.random() * (platform.length * BLOCK_WIDTH - 40) + 20;
+         if (!isWhiskasTooClose(energyItems, whiskasX, whiskasY, 10)) {
+           const type = Math.random() < 0.1 ? 'super' : 'normal';
+         const radius = type === 'super' ? 20 : 10;
+         energyItems.push({ x: whiskasX, y: whiskasY, radius, type });
+        }
     }
   } else {
     // Спавн в воздухе между платформами
     const midX = player.x + canvas.width / 2 + Math.random() * 300;
     const midY = GROUND_Y - PLATFORM_VERTICAL_SPACING * 1.5;
-     if (!isWhiskasTooClose(energyItems, midX, midY - 5, 10)) {
+       if (!isWhiskasTooClose(energyItems, midX, midY - 5, 10)) {
       energyItems.push({ x: midX, y: midY - 5, radius: 10, type: 'normal' });
      }
   }
@@ -1512,7 +1541,7 @@ function updateMeowButtonCooldown() {
     const percentage = (skillCooldown - timeSinceLastMeow) / skillCooldown;
     meowBtn.disabled = true;
     meowBtn.classList.add('cooldown');
-    meowBtn.style.background = `linear-gradient(to right, rgba(255,255,255,0.3) ${percentage * 100}%, rgba(255,255,255,0) ${percentage * 100}%)`;
+      meowBtn.style.background = `linear-gradient(to right, rgba(255,255,255,0.3) ${percentage * 100}%, rgba(255,255,255,0) ${percentage * 100}%)`;
   } else {
     meowBtn.disabled = false;
     meowBtn.classList.remove('cooldown');
@@ -1531,11 +1560,10 @@ function handleSkill() {
     player.fadeTimer = player.fadeDuration;
     player.invulnerable = true;
     lastSkillTime = now;
-   
+    spawnBlissParticles();
       createNormalMeow()
    updateMeowButtonCooldown();
 }
-
 
 function createNormalMeow() {
   const direction = player.direction;
@@ -1555,8 +1583,6 @@ function createNormalMeow() {
     }, i * waveInterval);
   }
 }
-
-
 function createSuperMeow() {
   const direction = player.direction;
   const numWaves = 10;
@@ -1593,7 +1619,7 @@ function performSwipeDash(angle) {
   player.isDashing = true;
   player.dashTimer = DASH_DURATION;
   player.invulnerable = true;
-    player.animationState = 'dash';
+     player.animationState = 'dash';
 
   if (comboCount === 0) {
     lastDashTime = Date.now();
@@ -1625,9 +1651,9 @@ function endDash() {
     comboCount++;
     lastDashTime = 0;
        if (comboCount >= 5) {
-        player.hp = Math.min(player.hp + 5, 100);
-           spawnFloatingText("+5HP", player.x + player.width / 2, player.y - 50);
-        }
+          player.hp = Math.min(player.hp + 5, 100);
+        spawnFloatingText("+5HP", player.x + player.width / 2, player.y - 50);
+      }
     showComboText();
   } else {
     comboCount = 0;
@@ -1639,7 +1665,7 @@ function showComboText() {
   comboMessageStart = Date.now();
   if (comboCount >= 5) {
       comboMessage = "SCAMRAGE!!!";
-    } else if (comboCount >= 2) {
+  } else if (comboCount >= 2) {
     comboMessage = `COMBO x${comboCount}`;
   } else {
     comboMessage = "";
@@ -1677,9 +1703,9 @@ function showSkillNotReady() {
 
 function drawComboMessage() {
   ctx.save();
-    ctx.font = "bold 36px 'Micro 5', sans-serif";
+     ctx.font = "bold 36px 'Micro 5', sans-serif";
   const colors = ["red", "yellow", "blue", "lime", "magenta"];
-   const colorIndex = Math.floor(Date.now() / 200) % colors.length;
+  const colorIndex = Math.floor(Date.now() / 200) % colors.length;
   ctx.fillStyle = `rgba(${colors[colorIndex]},${comboMessageAlpha})`;
   ctx.textAlign = "center";
   const posX = canvas.width / 2;
@@ -1762,33 +1788,33 @@ function checkCheatCode(code) {
   }
 }
 function spawnBlissParticles(){
-  for (let i = 0; i < blissSpawnRate; i++) {
-    const angle = Math.random() * Math.PI * 2;
-    const speed = Math.random() * 2 + 1;
-      const x = player.x + player.width / 2 + Math.cos(angle) * 20;
-    const y = player.y + player.height / 2 + Math.sin(angle) * 20;
-    blissParticles.push({
-      x: x,
-      y: y,
-      vx: Math.cos(angle) * speed,
-      vy: Math.sin(angle) * speed,
-      alpha: 1,
-        initialTime: Date.now(),
-    });
-  }
+   for (let i = 0; i < blissSpawnRate; i++) {
+      const angle = Math.random() * Math.PI * 2;
+        const speed = Math.random() * 2 + 1;
+        const x = player.x + player.width / 2 + Math.cos(angle) * 20;
+        const y = player.y + player.height / 2 + Math.sin(angle) * 20;
+      blissParticles.push({
+          x: x,
+          y: y,
+          vx: Math.cos(angle) * speed,
+          vy: Math.sin(angle) * speed,
+        alpha: 1,
+          initialTime: Date.now(),
+      });
+    }
 }
 
 function updateBlissParticles(){
     blissParticles.forEach((p, i) => {
     const elapsed = Date.now() - p.initialTime;
     const duration = 500;
-      if(elapsed > duration) {
-         blissParticles.splice(i, 1);
-      } else {
-        p.alpha = 1 - (elapsed/duration);
-        p.x += p.vx * gameSpeed;
-          p.y += p.vy * gameSpeed;
-      }
+        if(elapsed > duration) {
+            blissParticles.splice(i, 1);
+        } else {
+            p.alpha = 1 - (elapsed/duration);
+            p.x += p.vx * gameSpeed;
+            p.y += p.vy * gameSpeed;
+        }
   });
 }
 // =============================
@@ -1809,8 +1835,20 @@ function restartGame() {
 }
 
 function resetGame() {
+    
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+    const canvasAspectRatio = canvas.width / canvas.height;
+      const gameAspectRatio = 600 / 700
+    
+      if (canvasAspectRatio > gameAspectRatio) {
+            canvasScale = canvas.height / 700;
+      } else {
+            canvasScale = canvas.width / 600
+    }
+
   player.x = -100;
-    player.playerStartX = 100;
+  player.playerStartX = 100;
   player.y = GROUND_Y - player.height;
   player.velocityY = 0;
   player.velocityX = 0;
@@ -1818,14 +1856,14 @@ function resetGame() {
   player.superMeowReady = false;
   player.alive = true;
   player.hp = 100;
-    // Вычисляем область коллизии игрока
+  // Вычисляем область коллизии игрока
     player.collisionWidth = player.width * 0.85;
     player.collisionHeight = player.height * 0.85;
     player.collisionOffsetX = (player.width - player.collisionWidth) / 2;
     player.collisionOffsetY = (player.height - player.collisionHeight) / 2;
     player.isEntering = true;
-      player.isFading = false;
-       player.fadeTimer = 0;
+     player.isFading = false;
+      player.fadeTimer = 0;
     player.skillOpacity = 1;
   player.direction = 'right';
   player.animationState = 'idle';
@@ -1844,8 +1882,9 @@ function resetGame() {
   platforms = [];
   floatingTexts = [];
   damageParticles = [];
-    blissParticles = [];
+      blissParticles = [];
       fadeAlpha = 0;
+
 
   cameraX = -200;
   spawnTimer = Date.now();
@@ -1855,6 +1894,8 @@ function resetGame() {
   bossMeteorSpawnRate = 1000;
   gameOver = false;
   victory = false;
+      
+     document.body.style.overflow = 'hidden';
 
   clearInterval(timerInterval);
   gameTimer = 60;
@@ -1961,6 +2002,19 @@ function gameLoop() {
     requestAnimationFrame(gameLoop);
   }
 }
+function handleResize() {
+     canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+    const canvasAspectRatio = canvas.width / canvas.height;
+      const gameAspectRatio = 600 / 700;
+
+      if (canvasAspectRatio > gameAspectRatio) {
+          canvasScale = canvas.height / 700;
+       } else {
+         canvasScale = canvas.width / 600;
+       }
+  
+}
 
 function getRandomInterval(min, max) {
   return Math.floor(Math.random() * (max - min + 1)) + min;
@@ -1999,14 +2053,17 @@ function updateAnimations() {
 
 function updateDashAnimations() {
      dashFrameTimer++;
-    if (dashFrameTimer >= dashFrameInterval) {
-        dashFrameTimer = 0;
-        dashFrameIndex = (dashFrameIndex + 1) % dashFrames.length;
+     if (dashFrameTimer >= dashFrameInterval) {
+         dashFrameTimer = 0;
+         dashFrameIndex = (dashFrameIndex + 1) % dashFrames.length;
     }
 }
+
 // =============================
 // 13. Запуск игры при загрузке
 // =============================
 window.onload = () => {
+    handleResize()
+   window.addEventListener('resize', handleResize);
   // generateInitialPlatforms(); // Убрано, так как платформы теперь генерируются при старте
 };
