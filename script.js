@@ -2102,12 +2102,8 @@ function handleResize() {
     console.log("handleResize вызван");
 }
 
-// Инициализация при загрузке окна
-window.onload = () => {
-    handleResize();
-    window.addEventListener('resize', handleResize);
-
-    // Настройки Telegram Mini App
+document.addEventListener('DOMContentLoaded', () => {
+    // Проверяем доступность Telegram WebApp
     if (window.Telegram && window.Telegram.WebApp) {
         console.log("Telegram WebApp доступен");
 
@@ -2122,7 +2118,8 @@ window.onload = () => {
             // Добавляем обработчик события изменения области просмотра
             window.Telegram.WebApp.onEvent("viewportChanged", () => {
                 console.log("Событие viewportChanged получено");
-                handleResize();
+                // Если у вас есть функция handleResize, вызовите её здесь
+                // handleResize();
             });
 
             // Добавляем обработчик нового события scanQrPopupClosed
@@ -2130,10 +2127,14 @@ window.onload = () => {
                 console.log("Событие scanQrPopupClosed получено");
             });
 
+            // Уведомляем Telegram, что Mini App готов к отображению
+            window.Telegram.WebApp.ready();
+            console.log("Telegram WebApp готов");
+
         } catch (error) {
-            console.error("Ошибка при вызове disableVerticalSwipes:", error);
+            console.error("Ошибка при вызове методов Telegram WebApp:", error);
         }
     } else {
         console.log("Telegram WebApp не доступен");
     }
-};
+});
