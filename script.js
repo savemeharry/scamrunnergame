@@ -3,6 +3,8 @@
 // =============================
 // 0. Константы и Переменные
 // =============================
+const BASE_CANVAS_WIDTH = 400;
+const BASE_CANVAS_HEIGHT = 700;
 const PLATFORM_VERTICAL_SPACING = 80;
 const PLATFORM_BUFFER = 150;
 const MAX_JUMP_DISTANCE = 300;
@@ -779,7 +781,7 @@ function updateGame() {
 
     if (distance < collisionDistance) {
       if (player.isDashing) {
-                meteors.splice(index, 1);
+        meteors.splice(index, 1);
         explosions.push({ x: meteor.x, y: meteor.y, radius: 10, alpha: 1 });
         lastDashKill = true;
       } else {
@@ -946,14 +948,14 @@ function updateDashButtonCooldownAll() {
 }
 
 function drawGame(screenWidth, screenHeight) {
+    ctx.imageSmoothingEnabled = false;
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     
     ctx.save();
-     const offsetX = canvasOffsetX;
-     const offsetY = canvasOffsetY;
-        ctx.translate(offsetX, offsetY);
+      const offsetX = canvasOffsetX;
+      const offsetY = canvasOffsetY;
+      ctx.translate(Math.round(offsetX), Math.round(offsetY));
       ctx.scale(canvasScale, canvasScale);
-
 
   // Рисуем слои фона
   drawLayer(layers.background, cameraX * 0.2);
@@ -1110,7 +1112,7 @@ function drawGame(screenWidth, screenHeight) {
     const energyIconY = 20;
     ctx.drawImage(layers.energyIcon, energyIconX, energyIconY, 30, 30);
     ctx.fillStyle = "white";
-    ctx.font = "20px 'Micro 5', sans-serif";
+      ctx.font = "20px 'Micro 5', sans-serif";
     ctx.textAlign = "left";
     ctx.fillText(`${player.energy}`, energyIconX + 40, energyIconY + 25);
 
@@ -1126,12 +1128,12 @@ function drawGame(screenWidth, screenHeight) {
     ctx.strokeStyle = "#fff";
     ctx.strokeRect(progressX, progressY, progressWidth, progressHeight);
     ctx.fillStyle = "#fff";
-    ctx.font = "20px 'Micro 5', sans-serif";
+     ctx.font = "20px 'Micro 5', sans-serif";
     ctx.textAlign = "center";
     ctx.fillText("Progress to Boss", progressX + progressWidth/2, progressY + 15);
 
   ctx.fillStyle = "white";
-  ctx.font = "20px 'Micro 5', sans-serif";
+     ctx.font = "20px 'Micro 5', sans-serif";
   ctx.textAlign = "center";
   ctx.fillText(`${Math.ceil(gameTimer)}s`, canvas.width / 2, 30);
 
@@ -1372,12 +1374,12 @@ function drawCircle(object, color) {
 }
 
 function drawLayer(image, offsetX, yOffset = 0) {
-    const targetHeight = 700 * canvasScale;
-    const targetWidth = (image.width / image.height) * targetHeight;
+     const targetHeight = screenHeight;
+     const targetWidth = (image.width / image.height) * targetHeight;
     const posX = (-offsetX % targetWidth) ;
-    ctx.drawImage(image, posX, yOffset, targetWidth, targetHeight);
+    ctx.drawImage(image, Math.round(posX), yOffset, targetWidth, targetHeight);
     if (posX + targetWidth < canvas.width) {
-      ctx.drawImage(image, posX + targetWidth, yOffset, targetWidth, targetHeight);
+      ctx.drawImage(image,  Math.round(posX + targetWidth), yOffset, targetWidth, targetHeight);
     }
 }
 
@@ -1845,21 +1847,18 @@ function restartGame() {
 }
 
 function resetGame() {
-  canvas.width = 400;
-  canvas.height = 700;
+  canvas.width = BASE_CANVAS_WIDTH;
+    canvas.height = BASE_CANVAS_HEIGHT;
     screenWidth = window.innerWidth;
-   screenHeight = window.innerHeight;
-   const canvasAspectRatio = canvas.width / canvas.height;
-     const screenAspectRatio = screenWidth/screenHeight
-     if (screenAspectRatio > canvasAspectRatio) {
-         canvasScale = screenHeight / 700;
-         canvasOffsetX = (screenWidth - 400 * canvasScale)/2;
-         canvasOffsetY = (screenHeight - 700 * canvasScale)/2;
-       } else {
-           canvasScale = screenWidth / 400;
-           canvasOffsetX = (screenWidth - 400 * canvasScale)/2;
-           canvasOffsetY = (screenHeight - 700 * canvasScale)/2;
-     }
+    screenHeight = window.innerHeight;
+
+    canvasScale = screenHeight / BASE_CANVAS_HEIGHT;
+
+    canvas.width = Math.round(Math.max(screenWidth, BASE_CANVAS_WIDTH * canvasScale));
+    canvas.height = Math.round(screenHeight);
+    canvasOffsetX = (screenWidth -  canvas.width) / 2;
+    canvasOffsetY = 0;
+
     player.x = -100;
     player.playerStartX = 100;
   player.y = GROUND_Y - player.height;
@@ -2018,22 +2017,18 @@ function gameLoop() {
 }
 
 function handleResize() {
-    canvas.width = 400;
-  canvas.height = 700;
-     screenWidth = window.innerWidth;
-   screenHeight = window.innerHeight;
-   const canvasAspectRatio = canvas.width / canvas.height;
-     const screenAspectRatio = screenWidth/screenHeight
-     if (screenAspectRatio > canvasAspectRatio) {
-         canvasScale = screenHeight / 700;
-           canvasOffsetX = (screenWidth - 400 * canvasScale)/2;
-           canvasOffsetY = (screenHeight - 700 * canvasScale)/2;
-      } else {
-          canvasScale = screenWidth / 400;
-           canvasOffsetX = (screenWidth - 400 * canvasScale)/2;
-           canvasOffsetY = (screenHeight - 700 * canvasScale)/2;
-      }
+     canvas.width = BASE_CANVAS_WIDTH;
+      canvas.height = BASE_CANVAS_HEIGHT;
+      screenWidth = window.innerWidth;
+      screenHeight = window.innerHeight;
 
+      canvasScale = screenHeight / BASE_CANVAS_HEIGHT;
+
+    canvas.width = Math.round(Math.max(screenWidth, BASE_CANVAS_WIDTH * canvasScale));
+    canvas.height = Math.round(screenHeight);
+     canvasOffsetX = (screenWidth -  canvas.width) / 2;
+     canvasOffsetY = 0;
+     
      const uiTop = 20 / canvasScale; // Положение 20px от верхнего края
      const uiBottom = (screenHeight / canvasScale) - 80; // Положение 80px от нижнего края
 
