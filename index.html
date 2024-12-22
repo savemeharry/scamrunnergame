@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=no" />
+  <title>Мяутон: Telegram Mini App</title>
+  <link rel="stylesheet" href="style.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Micro+5&display=swap" rel="stylesheet">
+</head>
+<body>
+  <canvas id="gameCanvas" width="400" height="700"></canvas>
+
+  <div id="superMeowReady">SUPERMEOW READY!!!</div>
+
+  <div id="controls">
+    <button id="leftBtn" class="control-button">←</button>
+    <button id="jumpBtn" class="control-button">↑</button>
+    <button id="meowBtn" class="control-button">M</button>
+    <button id="rightBtn" class="control-button">→</button>
+    <button id="dashBtn" class="control-button">D</button>
+  </div>
+
+  <div id="startScreen" class="overlay" style="display: flex;">
+    <h1>SCAMRUNNER</h1>
+    <p>Fast food & beat scam</p>
+    <button id="startButton">Start!</button>
+  </div>
+
+  <div id="gameOverScreen" class="overlay">
+    <h1>Game Over</h1>
+    <p id="finalScore"></p>
+    <button id="restartButton">Play Again</button>
+  </div>
+
+  <div id="victoryScreen" class="overlay">
+    <img src="./images/elements/player_centered.png" alt="Player" />
+    <h1>Scam Destroyed!</h1>
+    <p id="victoryScore"></p>
+    <button id="restartVictoryButton">Play Again</button>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
