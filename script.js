@@ -2101,7 +2101,7 @@ window.onload = () => {
 
      // Telegram Mini Apps settings
     if(window.Telegram) {
-         window.Telegram.WebApp.isVerticalSwipesEnabled = true;
+         window.Telegram.WebApp.isVerticalSwipesEnabled = false;
         if (window.Telegram.WebApp.platform === "ios") {
              window.Telegram.WebApp.expand();
             console.log("isFullScreen: " + window.Telegram.WebApp.isExpanded);
