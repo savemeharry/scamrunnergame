@@ -317,25 +317,18 @@ let swipeData = {
 // Порог в пикселях, чтобы считать жест полноценным свайпом
 const SWIPE_THRESHOLD = 30
 
-function getCanvasPos(e) {
-  const rect = canvas.getBoundingClientRect()
-  return {
-    x: e.clientX - rect.left,
-    y: e.clientY - rect.top
-  }
-}
-
+// При нажатии/касании на canvas
 function onCanvasPointerDown(e) {
-  const pos = getCanvasPos(e)
-
+  // Запоминаем начальные координаты
   swipeData.active = true
-  swipeData.startX = pos.x
-  swipeData.startY = pos.y
-  swipeData.currentX = pos.x
-  swipeData.currentY = pos.y
+  swipeData.startX = e.clientX
+  swipeData.startY = e.clientY
+  swipeData.currentX = e.clientX
+  swipeData.currentY = e.clientY
 
-  const halfScreen = canvas.width / 2
-  if (pos.x < halfScreen) {
+  // Определяем, левая или правая половина экрана
+  const halfScreen = screenWidth / 2
+  if (e.clientX < halfScreen) {
     swipeData.side = 'left'
   } else {
     swipeData.side = 'right'
@@ -343,60 +336,86 @@ function onCanvasPointerDown(e) {
 
   canvas.setPointerCapture(e.pointerId)
 
+  // Если вдруг потребуется отлавливать движение
   document.addEventListener('pointermove', onCanvasPointerMove)
   document.addEventListener('pointerup', onCanvasPointerUp)
 }
 
+// Пока ведём палец/мышь
 function onCanvasPointerMove(e) {
   if (!swipeData.active) return
-
-  const pos = getCanvasPos(e)
-  swipeData.currentX = pos.x
-  swipeData.currentY = pos.y
+  swipeData.currentX = e.clientX
+  swipeData.currentY = e.clientY
 }
 
+// Когда отпускаем палец/кнопку
 function onCanvasPointerUp(e) {
   if (!swipeData.active) return
   swipeData.active = false
 
-  const pos = getCanvasPos(e)
-  swipeData.currentX = pos.x
-  swipeData.currentY = pos.y
-
   const dx = swipeData.currentX - swipeData.startX
   const dy = swipeData.currentY - swipeData.startY
 
+  // Если длина свайпа меньше порога, ничего не делаем
   if (Math.abs(dx) < SWIPE_THRESHOLD && Math.abs(dy) < SWIPE_THRESHOLD) {
+    // Просто "тап" - в данном случае без действий
     document.removeEventListener('pointermove', onCanvasPointerMove)
     document.removeEventListener('pointerup', onCanvasPointerUp)
     return
   }
 
+  // Свайп
   if (swipeData.side === 'left') {
-    // Смена направления или прыжок
+    // ЛЕВАЯ ПОЛОВИНА: смена направления и прыжки
+    // Определим, какой свайп сильнее — по X или по Y
     if (Math.abs(dx) > Math.abs(dy)) {
-      // Горизонтальный свайп
+      // Горизонтальный свайп => смена направления
       if (dx > 0) {
+        // Свайп вправо => игрок поворачивается и бежит вправо
         player.direction = 'right'
       } else {
+        // Свайп влево => игрок бежит влево
         player.direction = 'left'
       }
     } else {
-      // Вертикальный свайп
+      // Вертикальный свайп => прыжок
       if (dy < 0) {
+        // Свайп вверх
+        // Проверка: если недавно был свайп вверх (doubleJump)
         const now = Date.now()
         const timeSinceLastUp = now - swipeData.lastSwipeUpTime
         if (timeSinceLastUp < 400) {
+          // Менее 400мс назад был свайп вверх => double jump
           handleDoubleJump()
         } else {
+          // Обычный прыжок
           handleJump()
         }
         swipeData.lastSwipeUpTime = now
+      } else {
+        // Свайп вниз - в текущей механике не используется
+        // (можно расширить под "присесть", если нужно)
       }
     }
   } else {
-    // Правая половина - дэш
-    const angle = Math.atan2(dy, dx)
+    // ПРАВАЯ ПОЛОВИНА: отвечаем за дэш
+    // Вычислим угол свайпа
+    const rect = canvas.getBoundingClientRect()
+
+    // 2) Приводим startX/startY и currentX/currentY к координатам канваса:
+    const startXLocal = swipeData.startX - rect.left
+    const startYLocal = swipeData.startY - rect.top
+    const currentXLocal = swipeData.currentX - rect.left
+    const currentYLocal = swipeData.currentY - rect.top
+
+    // 3) Теперь считаем dx/dy в локальных координатах:
+    const dxLocal = currentXLocal - startXLocal
+    const dyLocal = currentYLocal - startYLocal
+
+    // 4) Вычисляем угол:
+    const angle = Math.atan2(dyLocal, dxLocal)
+
+    // 5) Вызываем дэш:
     performSwipeDash(angle)
   }
 
@@ -404,6 +423,8 @@ function onCanvasPointerUp(e) {
   document.removeEventListener('pointerup', onCanvasPointerUp)
 }
 
+// Навешиваем листенеры на canvas
+canvas.addEventListener('pointerdown', onCanvasPointerDown)
 
 // --- КОНЕЦ ГЛАВНЫХ ИЗМЕНЕНИЙ ПО ЗАПРОСУ ---
 
