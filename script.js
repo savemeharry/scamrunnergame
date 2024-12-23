@@ -19,9 +19,7 @@ const BLOCK_HEIGHT = 100;
 let baseGameSpeed = 0.8;
 let gameSpeed = baseGameSpeed;
 
-// Граница где заканчивается спрайт baseFront и начинается коллизия земли
-let GROUND_Y;
-
+const GROUND_Y = 550;
 
 const PLATFORM_TYPES = {
   LOW: 'low',
@@ -954,15 +952,24 @@ function drawGame(screenWidth, screenHeight) {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     
     ctx.save();
-        const offsetX = canvasOffsetX;
-        const offsetY = canvasOffsetY;
-          ctx.translate(Math.round(offsetX), Math.round(offsetY));
-        ctx.scale(canvasScale, canvasScale);
+      const offsetX = canvasOffsetX;
+      const offsetY = canvasOffsetY;
+      ctx.translate(Math.round(offsetX), Math.round(offsetY));
+      ctx.scale(canvasScale, canvasScale);
 
   // Рисуем слои фона
-  drawLayer(layers.background, cameraX * 0.2,0 ,screenHeight);
-  drawLayer(layers.buildingsMid, cameraX * 0.5,0,screenHeight);
-  drawLayer(layers.baseFront, cameraX * 0.8, screenHeight - layers.baseFront.height * canvasScale ,layers.baseFront.height * canvasScale);
+  drawLayer(layers.background, cameraX * 0.2);
+  drawLayer(layers.buildingsMid, cameraX * 0.5);
+  drawLayer(layers.baseFront, cameraX * 0.8);
+
+  // Рисуем землю
+  drawGround();
+
+  // Эффект мигания при активном боссе
+  if (boss.isActive && boss.isFlashing && boss.flashVisible) {
+    ctx.fillStyle = 'rgba(255,255,255,0.5)';
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+  }
 
   // Рисуем платформы
   platforms.forEach((platform) => {
@@ -1366,13 +1373,19 @@ function drawCircle(object, color) {
   ctx.fill();
 }
 
-function drawLayer(image, offsetX, yOffset = 0, targetHeight) {
-    const targetWidth = (image.width / image.height) * targetHeight;
+function drawLayer(image, offsetX, yOffset = 0) {
+     const targetHeight = screenHeight;
+     const targetWidth = (image.width / image.height) * targetHeight;
     const posX = (-offsetX % targetWidth) ;
-    ctx.drawImage(image, Math.round(posX), Math.round(yOffset), Math.round(targetWidth), Math.round(targetHeight));
-      if (posX + targetWidth < canvas.width) {
-          ctx.drawImage(image, Math.round(posX + targetWidth), Math.round(yOffset), Math.round(targetWidth), Math.round(targetHeight));
-      }
+    ctx.drawImage(image, Math.round(posX), yOffset, targetWidth, targetHeight);
+    if (posX + targetWidth < canvas.width) {
+      ctx.drawImage(image,  Math.round(posX + targetWidth), yOffset, targetWidth, targetHeight);
+    }
+}
+
+function drawGround() {
+  ctx.fillStyle = "rgba(0, 0, 0, 0)"; // Коричневый цвет для земли
+  ctx.fillRect(0, GROUND_Y, canvas.width, canvas.height - GROUND_Y);
 }
 
 function clamp(value, min, max) {
@@ -1834,7 +1847,7 @@ function restartGame() {
 }
 
 function resetGame() {
-   canvas.width = BASE_CANVAS_WIDTH;
+  canvas.width = BASE_CANVAS_WIDTH;
     canvas.height = BASE_CANVAS_HEIGHT;
     screenWidth = window.innerWidth;
     screenHeight = window.innerHeight;
@@ -1842,10 +1855,10 @@ function resetGame() {
     canvasScale = screenHeight / BASE_CANVAS_HEIGHT;
 
     canvas.width = Math.round(Math.max(screenWidth, BASE_CANVAS_WIDTH * canvasScale));
-      canvas.height = Math.round(screenHeight);
-    canvasOffsetX = (screenWidth - canvas.width) / 2;
+    canvas.height = Math.round(screenHeight);
+    canvasOffsetX = (screenWidth -  canvas.width) / 2;
     canvasOffsetY = 0;
-      GROUND_Y = screenHeight - layers.baseFront.height * canvasScale;
+
     player.x = -100;
     player.playerStartX = 100;
   player.y = GROUND_Y - player.height;
@@ -2004,19 +2017,18 @@ function gameLoop() {
 }
 
 function handleResize() {
-    canvas.width = BASE_CANVAS_WIDTH;
-    canvas.height = BASE_CANVAS_HEIGHT;
-    screenWidth = window.innerWidth;
-    screenHeight = window.innerHeight;
+     canvas.width = BASE_CANVAS_WIDTH;
+      canvas.height = BASE_CANVAS_HEIGHT;
+      screenWidth = window.innerWidth;
+      screenHeight = window.innerHeight;
 
-    canvasScale = screenHeight / BASE_CANVAS_HEIGHT;
+      canvasScale = screenHeight / BASE_CANVAS_HEIGHT;
 
     canvas.width = Math.round(Math.max(screenWidth, BASE_CANVAS_WIDTH * canvasScale));
     canvas.height = Math.round(screenHeight);
-    canvasOffsetX = (screenWidth - canvas.width) / 2;
-    canvasOffsetY = 0;
-     GROUND_Y = screenHeight - layers.baseFront.height * canvasScale;
-
+     canvasOffsetX = (screenWidth -  canvas.width) / 2;
+     canvasOffsetY = 0;
+     
      const uiTop = 20 / canvasScale; // Положение 20px от верхнего края
      const uiBottom = (screenHeight / canvasScale) - 80; // Положение 80px от нижнего края
 
@@ -2071,8 +2083,8 @@ function updateDashAnimations() {
 // 13. Запуск игры при загрузке
 // =============================
 window.onload = () => {
-     handleResize()
-           window.addEventListener('resize', handleResize);
+    handleResize()
+    window.addEventListener('resize', handleResize);
 
     // Telegram Mini Apps settings
     if(window.Telegram) {
