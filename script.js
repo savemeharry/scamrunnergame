@@ -640,12 +640,21 @@ function updateGame(){
       player.isEntering=false
     }
   }else if(player.isDashing){
-    // во время дэша логика в endDash
-    player.dashTimer-=16.67
-    if(player.dashTimer<=0){
-      endDash()
+    // Обновляем таймер дэша
+    player.dashTimer -= 16.67
+    
+    // Обновляем позицию игрока
+    player.x += player.velocityX * gameSpeed
+    player.y += player.velocityY * gameSpeed
+    
+    // Применяем гравитацию к вертикальной скорости во время дэша
+    player.velocityY += player.gravity * gameSpeed
+    
+    // Проверяем окончание дэша
+    if(player.dashTimer <= 0){
+        endDash()
     }
-  }else{
+}else{
     // обычное движение
     player.x+=player.velocityX*gameSpeed
     player.y+=player.velocityY*gameSpeed
