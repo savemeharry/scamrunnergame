@@ -947,23 +947,23 @@ function updateGame() {
 function updateDashButtonCooldownAll() {
 }
 
+// Определите смещения для слоёв
+const backgroundYOffset = 50;
+const buildingsMidYOffset = 50;
+const baseFrontYOffset = 77;
+
 function drawGame(screenWidth, screenHeight) {
+    // Очищаем экран
     ctx.imageSmoothingEnabled = false;
     ctx.clearRect(0, 0, canvas.width, canvas.height);
-    
-    ctx.save();
-      const offsetX = canvasOffsetX;
-      const offsetY = canvasOffsetY;
-      ctx.translate(Math.round(offsetX), Math.round(offsetY));
-      ctx.scale(canvasScale, canvasScale);
 
-  // Рисуем слои фона
-  drawLayer(layers.background, cameraX * 0.2);
-  drawLayer(layers.buildingsMid, cameraX * 0.5);
-  drawLayer(layers.baseFront, cameraX * 0.8);
+    // Рисуем слои фона с использованием переменных смещений
+    drawLayer(layers.background, cameraX * 0.2, backgroundYOffset);
+    drawLayer(layers.buildingsMid, cameraX * 0.5, buildingsMidYOffset);
+    drawLayer(layers.baseFront, cameraX * 0.8, baseFrontYOffset);
 
-  // Рисуем землю
-  drawGround();
+    // Рисуем землю
+    drawGround();
 
   // Эффект мигания при активном боссе
   if (boss.isActive && boss.isFlashing && boss.flashVisible) {
@@ -1374,12 +1374,35 @@ function drawCircle(object, color) {
 }
 
 function drawLayer(image, offsetX, yOffset = 0) {
-     const targetHeight = screenHeight;
-     const targetWidth = (image.width / image.height) * targetHeight;
-    const posX = (-offsetX % targetWidth) ;
-    ctx.drawImage(image, Math.round(posX), yOffset, targetWidth, targetHeight);
-    if (posX + targetWidth < canvas.width) {
-      ctx.drawImage(image,  Math.round(posX + targetWidth), yOffset, targetWidth, targetHeight);
+    const targetWidth = 1200; // Желаемая ширина фона
+    const targetHeight = 600; // Желаемая высота фона
+
+    const posX = -offsetX % targetWidth;
+    const posY = yOffset;
+
+    // Определяем, сколько раз нужно повторить фон по вертикали
+    const numVerticalRepeats = Math.ceil(canvas.height / targetHeight);
+
+    for (let i = 0; i < numVerticalRepeats; i++) {
+        // Рисуем основной фон
+        ctx.drawImage(
+            image,
+            Math.round(posX) - canvasOffsetX,
+            Math.round(posY + i * targetHeight) - canvasOffsetY,
+            targetWidth,
+            targetHeight
+        );
+
+        // Повторяем фон по горизонтали, если это необходимо
+        if (posX + targetWidth < canvas.width) {
+            ctx.drawImage(
+                image,
+                Math.round(posX + targetWidth) - canvasOffsetX,
+                Math.round(posY + i * targetHeight) - canvasOffsetY,
+                targetWidth,
+                targetHeight
+            );
+        }
     }
 }
 
@@ -2022,15 +2045,16 @@ function handleResize() {
       screenWidth = window.innerWidth;
       screenHeight = window.innerHeight;
 
-      canvasScale = screenHeight / BASE_CANVAS_HEIGHT;
+    canvasScale = 1;
 
-    canvas.width = Math.round(Math.max(screenWidth, BASE_CANVAS_WIDTH * canvasScale));
-    canvas.height = Math.round(screenHeight);
-     canvasOffsetX = (screenWidth -  canvas.width) / 2;
-     canvasOffsetY = 0;
+     canvas.width = Math.round(Math.max(screenWidth, BASE_CANVAS_WIDTH));
+     canvas.height = Math.round(Math.max(screenHeight, BASE_CANVAS_HEIGHT));
+
+    canvasOffsetX = (screenWidth -  canvas.width) / 2;
+    canvasOffsetY = (screenHeight -  canvas.height) / 2;
      
-     const uiTop = 20 / canvasScale; // Положение 20px от верхнего края
-     const uiBottom = (screenHeight / canvasScale) - 80; // Положение 80px от нижнего края
+     const uiTop = 20;
+     const uiBottom = (screenHeight) - 650;
 
       controls.style.bottom = uiBottom + "px";
       superMeowReadyEl.style.top = uiTop + "px";

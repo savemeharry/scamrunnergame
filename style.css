@@ -143,16 +143,17 @@ button:disabled {
 #controls {
   position: absolute;
   left: 50%;
+  bottom: 15%; /* Добавляем сдвиг вниз на 50px */
   transform: translateX(-50%);
   display: flex;
   gap: 10px;
   z-index: 5;
-     user-select: none;
-       -webkit-user-select: none; /* Safari */
-          -moz-user-select: none; /* Firefox */
-          -ms-user-select: none; /* IE/Edge */
-          -webkit-touch-callout: none; /* отключает менюшку копирования */
-         -webkit-tap-highlight-color: transparent; /* отключает подсветку */
+  user-select: none;
+  -webkit-user-select: none; /* Safari */
+  -moz-user-select: none; /* Firefox */
+  -ms-user-select: none; /* IE/Edge */
+  -webkit-touch-callout: none; /* отключает менюшку копирования */
+  -webkit-tap-highlight-color: transparent; /* отключает подсветку */
 }
 
 .control-button {
