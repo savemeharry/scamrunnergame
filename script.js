@@ -743,6 +743,7 @@ function updateGame() {
           meteors[index].state = 'exploding'
           meteors[index].frameIndex = 0
           meteors[index].frameTimer = 0
+          lastDashKill = true;
         } else {
           // Игрок получает урон
           playerTakeDamage(10)
@@ -1073,7 +1074,7 @@ function drawGame(screenWidth, screenHeight) {
     drawCollisionBox()
   }
 
-  const energyIconX = 20
+  const energyIconX = 40
   const energyIconY = 80
   ctx.drawImage(layers.energyIcon, energyIconX, energyIconY, 30, 30)
   ctx.fillStyle = "white"
@@ -1081,9 +1082,9 @@ function drawGame(screenWidth, screenHeight) {
   ctx.textAlign = "left"
   ctx.fillText(`${player.energy}`, energyIconX + 40, energyIconY + 25)
 
-  const progressX = 20
+  const progressX = 40
   const progressY = 130
-  const progressWidth = canvas.width - 40
+  const progressWidth = canvas.width - 70
   const progressHeight = 20
   ctx.fillStyle = "#555"
   ctx.fillRect(progressX, progressY, progressWidth, progressHeight)
@@ -1100,7 +1101,7 @@ function drawGame(screenWidth, screenHeight) {
   ctx.fillStyle = "white"
   ctx.font = "34px 'Micro 5', sans-serif"
   ctx.textAlign = "center"
-  ctx.fillText(`${Math.ceil(gameTimer)}s`, canvas.width / 2, canvas.height - 700)
+  ctx.fillText(`${Math.ceil(gameTimer)}s`, canvas.width / 2, 100)
 
   if (boss.isActive) {
     ctx.drawImage(layers.boss, boss.x - cameraX - boss.width / 2, boss.y - boss.height / 2, boss.width, boss.height)
@@ -1918,12 +1919,12 @@ function endGame(victoryCondition = false) {
   clearInterval(timerInterval)
   if (victoryCondition) {
     victoryScreen.style.display = "flex"
-    victoryScoreEl.textContent = `Поздравляем! Вы победили босса и собрали energy: ${player.energy}`
+    victoryScoreEl.textContent = `YO! YOU DID IT: ${player.energy}`
   } else if (player.hp <= 0) {
-    finalScoreEl.textContent = `Игра окончена! Вы собрали energy: ${player.energy}`
+    finalScoreEl.textContent = `GAME OVER! ENRGY: ${player.energy}`
     gameOverScreen.style.display = "flex"
   } else if (gameTimer <= 0) {
-    finalScoreEl.textContent = `Время вышло! Вы собрали energy: ${player.energy}`
+    finalScoreEl.textContent = `GAME OVER! ENRGY: ${player.energy}`
     gameOverScreen.style.display = "flex"
   }
 }
