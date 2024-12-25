@@ -629,6 +629,16 @@ function updateGame() {
     player.x += player.velocityX * gameSpeed
     player.y += player.velocityY * gameSpeed
     player.velocityY += player.gravity * gameSpeed
+      // -- НАЧАЛО ПРОВЕРКИ СТОЛКНОВЕНИЯ С БОССОМ --
+      if (boss.isActive && !boss.isFlashing &&
+            player.x + player.collisionWidth > boss.x - boss.width/2 &&
+            player.x < boss.x + boss.width/2 &&
+                player.y + player.collisionHeight > boss.y - boss.height/2 &&
+                player.y < boss.y + boss.height/2
+            ) {
+        bossTakeDamage(1);
+      }
+     // -- КОНЕЦ ПРОВЕРКИ СТОЛКНОВЕНИЯ С БОССОМ --
     if (player.dashTimer <= 0) {
       endDash()
     }
@@ -693,7 +703,6 @@ function updateGame() {
     }
   })
 
-  // Спавн метеоритов и energy (как раньше)
   if (!boss.isActive) {
     if (Date.now() - spawnTimer > meteorSpawnRate) {
       spawnMeteor()
@@ -715,37 +724,31 @@ function updateGame() {
     }
   }
 
-  // --- ЛОГИКА МЕТЕОРИТОВ (замена старой) ---
   meteors.forEach((meteor, index) => {
     if (meteor.state === 'flying') {
-      // Двигаемся
       meteor.x += meteor.speedX * gameSpeed
       meteor.y += meteor.speedY * gameSpeed
 
-      // Обновляем анимацию полёта
       meteor.frameTimer++
       if (meteor.frameTimer >= meteor.frameInterval) {
         meteor.frameTimer = 0
         meteor.frameIndex++
         if (meteor.frameIndex >= meteorFlyingFrames.length) {
-          meteor.frameIndex = 0 // зациклим полёт
+          meteor.frameIndex = 0
         }
       }
 
-      // Проверка столкновения с игроком
       const dx = meteor.x - (collisionX + player.collisionWidth / 2)
       const dy = meteor.y - (collisionY + player.collisionHeight / 2)
       const distance = Math.sqrt(dx * dx + dy * dy)
       const collisionDistance = meteor.radius + Math.max(player.collisionWidth, player.collisionHeight) / 2
       if (distance < collisionDistance) {
         if (player.isDashing) {
-          // Если дэш — уничтожаем метеор сразу
           meteors[index].state = 'exploding'
           meteors[index].frameIndex = 0
           meteors[index].frameTimer = 0
-          lastDashKill = true;
+          lastDashKill = true
         } else {
-          // Игрок получает урон
           playerTakeDamage(10)
           meteors[index].state = 'exploding'
           meteors[index].frameIndex = 0
@@ -753,29 +756,24 @@ function updateGame() {
         }
       }
 
-      // Если метеор достиг земли
       if (meteor.y >= GROUND_Y) {
         meteors[index].state = 'exploding'
         meteors[index].frameIndex = 0
         meteors[index].frameTimer = 0
       }
     } else if (meteor.state === 'exploding') {
-      // Воспроизводим анимацию взрыва
       meteor.frameTimer++
       if (meteor.frameTimer >= meteor.frameInterval) {
         meteor.frameTimer = 0
         meteor.frameIndex++
         if (meteor.frameIndex >= meteorSmashFrames.length) {
-          // Анимация взрыва закончилась — убираем метеор
           meteors.splice(index, 1)
           return
         }
       }
     }
   })
-  // --- КОНЕЦ логики метеоритов ---
 
-  // Взрывы, если они остались для чего-то — оставляем
   explosions.forEach((explosion, index) => {
     explosion.radius += 5 * gameSpeed
     explosion.alpha -= 0.05
@@ -1654,6 +1652,12 @@ function endDash() {
     comboCount = 0
   }
 }
+
+function bossTakeDamage(amount) {
+    if (boss.isFlashing) return;
+    boss.hp -= amount;
+     spawnFloatingText("-" + amount, boss.x, boss.y - 50)
+    }
 
 function showComboText() {
   comboMessageAlpha = 1
